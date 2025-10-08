@@ -1,6 +1,6 @@
 'use client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -29,43 +29,63 @@ import { UserNav } from '@/components/layout/user-nav';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FloatingChatbotButton } from '@/components/chatbot/floating-chatbot-button';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
 
 function DashboardSidebar() {
   const { user } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
+  const activeTab = searchParams.get('tab') || 'overview';
+
+  const handleNav = (href: string) => {
+    if (href.startsWith('#')) {
+      const tab = href.substring(1);
+      router.push(`/dashboard?tab=${tab}`);
+    } else {
+       toast({ title: `Navigating to ${href.substring(1)}`});
+       // In a real app, you would use: router.push(href);
+    }
+  };
 
   const navItems = {
     beneficiary: [
       {
-        href: '#',
+        id: 'overview',
         icon: <LayoutDashboard />,
         label: 'Overview',
       },
       {
-        href: '#',
+        id: 'repayments',
         icon: <BarChart3 />,
-        label: 'My Score',
+        label: 'Repayments',
+      },
+       {
+        id: 'profile',
+        icon: <Users />,
+        label: 'Profile',
       },
     ],
     officer: [
       {
-        href: '#',
+        id: 'dashboard',
         icon: <LayoutDashboard />,
         label: 'Dashboard',
       },
       {
-        href: '#',
+        id: 'beneficiaries',
         icon: <Users />,
         label: 'Beneficiaries',
       },
     ],
     admin: [
       {
-        href: '#',
+        id: 'analytics',
         icon: <LayoutDashboard />,
         label: 'Analytics',
       },
       {
-        href: '#',
+        id: 'user-management',
         icon: <Users />,
         label: 'User Management',
       },
@@ -81,9 +101,12 @@ function DashboardSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          {currentNavItems.map((item, index) => (
-            <SidebarMenuItem key={index}>
-              <SidebarMenuButton href={item.href} isActive={index === 0}>
+          {currentNavItems.map((item) => (
+            <SidebarMenuItem key={item.id}>
+              <SidebarMenuButton 
+                onClick={() => handleNav(`#${item.id}`)}
+                isActive={activeTab === item.id}
+              >
                 {item.icon}
                 <span>{item.label}</span>
               </SidebarMenuButton>
@@ -94,13 +117,13 @@ function DashboardSidebar() {
       <SidebarFooter className="mt-auto">
         <SidebarMenu>
            <SidebarMenuItem>
-             <SidebarMenuButton href="#">
+             <SidebarMenuButton onClick={() => handleNav('/help')}>
                <HelpCircle />
                <span>Help</span>
              </SidebarMenuButton>
            </SidebarMenuItem>
             <SidebarMenuItem>
-             <SidebarMenuButton href="#">
+             <SidebarMenuButton onClick={() => handleNav('/settings')}>
                <Settings />
                <span>Settings</span>
              </SidebarMenuButton>
@@ -143,6 +166,9 @@ function DashboardHeader() {
 export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab') || 'overview';
+
 
   useEffect(() => {
     if (!loading && !user) {
@@ -161,7 +187,7 @@ export default function DashboardPage() {
   const renderDashboard = () => {
     switch (user.role) {
       case 'beneficiary':
-        return <BeneficiaryDashboard />;
+        return <BeneficiaryDashboard activeTab={tab} />;
       case 'officer':
         return <OfficerDashboard />;
       case 'admin':

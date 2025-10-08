@@ -54,6 +54,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { useRouter } from 'next/navigation';
 
 const chartConfig: ChartConfig = {
   essential: {
@@ -71,8 +72,9 @@ const repaymentChartConfig: ChartConfig = {
     due: { label: "Due", color: "hsl(var(--chart-1))" },
 }
 
-export default function BeneficiaryDashboard() {
+export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activeTab?: string }) {
   const { user } = useAuth();
+  const router = useRouter();
   const {
     creditScore,
     riskLevel,
@@ -84,9 +86,14 @@ export default function BeneficiaryDashboard() {
   } = MOCK_BENEFICIARY_DATA;
 
   const scorePercentage = (creditScore / 1000) * 100;
+  
+  const handleTabChange = (value: string) => {
+    router.push(`/dashboard?tab=${value}`, { scroll: false });
+  };
+
 
   return (
-    <Tabs defaultValue="overview">
+    <Tabs value={activeTab} onValueChange={handleTabChange} defaultValue="overview">
       <TabsList className="mb-6 grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="repayments">Repayments</TabsTrigger>
@@ -138,7 +145,7 @@ export default function BeneficiaryDashboard() {
             </CardHeader>
             <CardContent className="space-y-3">
               {insights.map((insight, i) => (
-                <div key={i} className="flex items-start gap-3 rounded-lg border bg-card p-3">
+                <div key={i} className="flex items-start gap-3 rounded-lg border bg-card p-3 transition-all hover:shadow-md">
                   <ThumbsUp className="h-5 w-5 flex-shrink-0 text-green-600" />
                   <p className="text-sm text-foreground">{insight}</p>
                 </div>

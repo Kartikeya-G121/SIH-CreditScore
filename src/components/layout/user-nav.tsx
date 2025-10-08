@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/auth-context';
+import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,12 +18,24 @@ import {
   DropdownMenuSubContent
 } from '@/components/ui/dropdown-menu';
 import { CreditCard, LogOut, Settings, User as UserIcon, Users } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export function UserNav() {
   const { user, logout, users, switchUser } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
 
   if (!user) {
     return null;
+  }
+
+  const handleNavigation = (path: string) => {
+    if (path.startsWith('/')) {
+       toast({ title: `Navigating to ${path}`});
+       // In a real app, you would use: router.push(path);
+    } else {
+      router.push(`/dashboard?tab=${path}`);
+    }
   }
 
   return (
@@ -46,15 +59,15 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => handleNavigation('profile')}>
             <UserIcon className="mr-2" />
             <span>Profile</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => handleNavigation('/billing')}>
             <CreditCard className="mr-2" />
             <span>Billing</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => handleNavigation('/settings')}>
             <Settings className="mr-2" />
             <span>Settings</span>
           </DropdownMenuItem>
