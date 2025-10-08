@@ -66,18 +66,21 @@ export default function OfficerDashboard() {
           value="Rajasthan"
           icon={<TrendingUp className="h-4 w-4" />}
           description="99% repayment rate"
+          className="transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
         />
         <StatCard
           title="Default Prediction Alert"
           value="3 High-Risk Profiles"
           icon={<ShieldAlert className="h-4 w-4 text-destructive" />}
           description="In West Bengal"
+          className="transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
         />
         <StatCard
           title="Most Active Region"
           value="Maharashtra"
           icon={<MapPin className="h-4 w-4" />}
           description="Highest loan applications"
+          className="transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
         />
       </div>
 
@@ -105,7 +108,7 @@ export default function OfficerDashboard() {
             </TableHeader>
             <TableBody>
               {MOCK_BENEFICIARIES_LIST.map((beneficiary) => (
-                <TableRow key={beneficiary.id}>
+                <TableRow key={beneficiary.id} className="transition-colors hover:bg-muted/50">
                   <TableCell className="font-medium">
                     {beneficiary.name}
                   </TableCell>

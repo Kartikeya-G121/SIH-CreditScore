@@ -268,7 +268,7 @@ export default function BeneficiaryDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               {financialAdvice.map(item => (
-                <div key={item.id} className="flex items-start space-x-4 rounded-lg border p-4">
+                <div key={item.id} className="flex items-start space-x-4 rounded-lg border p-4 transition-all hover:shadow-md hover:bg-muted/50">
                   <div className="flex-shrink-0 pt-1">
                     <Lightbulb className="h-6 w-6 text-primary" />
                   </div>
