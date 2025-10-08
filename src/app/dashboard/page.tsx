@@ -26,9 +26,9 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { UserNav } from '@/components/layout/user-nav';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { FloatingChatbotButton } from '../chatbot/floating-chatbot-button';
-import { Separator } from '../ui/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { FloatingChatbotButton } from '@/components/chatbot/floating-chatbot-button';
+import { Separator } from '@/components/ui/separator';
 
 function DashboardSidebar() {
   const { user } = useAuth();
