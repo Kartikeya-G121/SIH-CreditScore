@@ -103,6 +103,5 @@ export const MOCK_ADMIN_DATA = {
         { month: 'Nov', score: 725 },
         { month: 'Dec', score: 728 },
         { month: 'Jan', score: 730 },
-    ],
-    blockchainStatus: 'Operational'
+    ]
 };

@@ -16,7 +16,6 @@ import {
 import {
   Activity,
   Download,
-  ShieldCheck,
   TrendingUp,
   Users,
   Wallet,
@@ -32,7 +31,7 @@ import {
 import { StatCard } from '@/components/shared/stat-card';
 
 export default function AdminDashboard() {
-  const { stats, riskDistribution, aiForecast, blockchainStatus } = MOCK_ADMIN_DATA;
+  const { stats, riskDistribution, aiForecast } = MOCK_ADMIN_DATA;
 
   return (
     <div className="space-y-6">
@@ -42,24 +41,28 @@ export default function AdminDashboard() {
           value={stats.totalBeneficiaries}
           icon={<Users className="h-4 w-4" />}
           description="+20.1% from last month"
+          className="transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
         />
         <StatCard
           title="Active Loans"
           value={stats.activeLoans}
           icon={<Wallet className="h-4 w-4" />}
           description="+180.1% from last month"
+          className="transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
         />
         <StatCard
           title="Average Score"
           value={stats.averageScore}
           icon={<TrendingUp className="h-4 w-4" />}
           description="+12 since last month"
+          className="transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
         />
         <StatCard
           title="Regional Default Rate"
           value={`${stats.regionalDefaultRate}`}
           icon={<Activity className="h-4 w-4" />}
           description="-1.2% from last month"
+          className="transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
         />
       </div>
 
@@ -120,26 +123,7 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>System Status</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Blockchain Integrity</span>
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-green-600" />
-                <span className="text-green-600 font-semibold">
-                  {blockchainStatus}
-                </span>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              All data transactions are secure and verified on the blockchain.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1">
         <Card>
           <CardHeader>
             <CardTitle>Reporting</CardTitle>
