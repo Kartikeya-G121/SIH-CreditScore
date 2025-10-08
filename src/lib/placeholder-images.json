@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "A smiling rural entrepreneur using a mobile phone for a transaction.",
+      "imageUrl": "https://picsum.photos/seed/hero-credit/600/400",
+      "imageHint": "happy entrepreneur phone"
+    },
+    {
+      "id": "partner-nbcfdc",
+      "description": "NBCFDC Logo",
+      "imageUrl": "https://picsum.photos/seed/nbcfdc-logo/200/100",
+      "imageHint": "NBCFDC logo"
+    },
+    {
+      "id": "partner-sidbi",
+      "description": "SIDBI Logo",
+      "imageUrl": "https://picsum.photos/seed/sidbi-logo/200/100",
+      "imageHint": "SIDBI logo"
+    },
+    {
+      "id": "partner-upi",
+      "description": "UPI Logo",
+      "imageUrl": "https://picsum.photos/seed/upi-logo/200/100",
+      "imageHint": "UPI logo"
+    },
+    {
+      "id": "partner-digital-india",
+      "description": "Digital India Logo",
+      "imageUrl": "https://picsum.photos/seed/digital-india-logo/200/100",
+      "imageHint": "Digital India logo"
+    },
+    {
+      "id": "partner-startup-india",
+      "description": "Startup India Logo",
+      "imageUrl": "https://picsum.photos/seed/startup-india-logo/200/100",
+      "imageHint": "Startup India logo"
+    }
+  ]
 }
