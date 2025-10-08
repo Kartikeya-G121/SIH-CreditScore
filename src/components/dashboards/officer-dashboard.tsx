@@ -43,7 +43,7 @@ const riskVariant: { [key: string]: 'default' | 'destructive' | 'outline' } = {
   High: 'destructive',
 };
 const riskColorClass = {
-  Low: 'bg-accent text-accent-foreground',
+  Low: 'bg-green-600 text-white',
   Medium: 'bg-yellow-500 text-white',
   High: 'bg-destructive text-destructive-foreground',
 };

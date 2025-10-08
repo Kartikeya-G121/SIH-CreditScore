@@ -125,7 +125,7 @@ export default function BeneficiaryDashboard() {
                   <span className="text-sm font-medium text-muted-foreground">Credit Score</span>
                 </div>
               </div>
-              <Badge variant={riskLevel === 'Low' ? 'default' : 'destructive'} className={`mt-4 ${riskLevel === 'Low' ? 'bg-accent text-accent-foreground' : ''}`}>
+              <Badge variant={riskLevel === 'Low' ? 'default' : 'destructive'} className={`mt-4 ${riskLevel === 'Low' ? 'bg-green-600 text-white' : ''}`}>
                 {riskLevel} Risk
               </Badge>
             </CardContent>
@@ -139,7 +139,7 @@ export default function BeneficiaryDashboard() {
             <CardContent className="space-y-3">
               {insights.map((insight, i) => (
                 <div key={i} className="flex items-start gap-3 rounded-lg border bg-card p-3">
-                  <ThumbsUp className="h-5 w-5 flex-shrink-0 text-accent" />
+                  <ThumbsUp className="h-5 w-5 flex-shrink-0 text-green-600" />
                   <p className="text-sm text-foreground">{insight}</p>
                 </div>
               ))}
@@ -190,7 +190,7 @@ export default function BeneficiaryDashboard() {
                     <TableCell>{payment.dueDate}</TableCell>
                     <TableCell className="font-medium flex items-center"><IndianRupee className="h-4 w-4 mr-1" />{payment.amount.toLocaleString()}</TableCell>
                     <TableCell>
-                      <Badge variant={payment.status === 'Paid' ? 'outline' : 'default'} className={payment.status === 'Paid' ? 'border-accent text-accent' : ''}>
+                      <Badge variant={payment.status === 'Paid' ? 'outline' : 'default'} className={payment.status === 'Paid' ? 'border-green-600 text-green-600' : ''}>
                         {payment.status === 'Paid' && <CheckCircle2 className="mr-1 h-3 w-3" />}
                         {payment.status}
                       </Badge>

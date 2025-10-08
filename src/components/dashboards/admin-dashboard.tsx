@@ -129,8 +129,8 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
               <span className="font-medium">Blockchain Integrity</span>
               <div className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-accent" />
-                <span className="text-accent font-semibold">
+                <ShieldCheck className="h-5 w-5 text-green-600" />
+                <span className="text-green-600 font-semibold">
                   {blockchainStatus}
                 </span>
               </div>

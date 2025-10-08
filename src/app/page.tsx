@@ -74,45 +74,47 @@ export default function Home() {
       <LandingHeader />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="container grid grid-cols-1 items-center gap-8 py-20 md:grid-cols-2 lg:py-32">
-          <div className="space-y-6 text-center md:text-left">
-            <h1 className="font-headline text-4xl font-bold tracking-tighter md:text-5xl lg:text-6xl">
-              Empowering India through AI-Driven Credit Scoring.
-            </h1>
-            <p className="mx-auto max-w-[700px] text-lg text-muted-foreground md:mx-0">
-              Inclusive finance for every entrepreneur and dreamer. Our platform
-              radiates trust, inclusivity, and digital empowerment.
-            </p>
-            <div className="space-x-4">
-              <Button size="lg" asChild>
-                <Link href="/register">
-                  Get Started <ArrowRight className="ml-2" />
-                </Link>
-              </Button>
+        <section className="landing-gradient text-white">
+          <div className="container grid grid-cols-1 items-center gap-8 py-20 md:grid-cols-2 lg:py-32">
+            <div className="space-y-6 text-center md:text-left">
+              <h1 className="font-headline text-4xl font-bold tracking-tighter md:text-5xl lg:text-6xl">
+                Empowering India through AI-Driven Credit Scoring.
+              </h1>
+              <p className="mx-auto max-w-[700px] text-lg text-gray-200 md:mx-0">
+                Inclusive finance for every entrepreneur and dreamer. Our platform
+                radiates trust, inclusivity, and digital empowerment.
+              </p>
+              <div className="space-x-4">
+                <Button size="lg" asChild variant="secondary">
+                  <Link href="/register">
+                    Get Started <ArrowRight className="ml-2" />
+                  </Link>
+                </Button>
+              </div>
             </div>
-          </div>
-          <div className="relative">
-            {heroImage && (
-              <Image
-                src={heroImage.imageUrl}
-                alt={heroImage.description}
-                width={600}
-                height={400}
-                className="mx-auto overflow-hidden rounded-xl object-cover"
-                data-ai-hint={heroImage.imageHint}
-              />
-            )}
-            <div className="absolute -bottom-8 -right-8 z-10 hidden lg:block">
-              <Card className="w-64 rounded-xl bg-background/80 p-4 shadow-lg backdrop-blur-sm">
-                <p className="text-sm font-semibold">AI Composite Score</p>
-                <div className="flex items-center gap-2">
-                  <p className="text-3xl font-bold text-primary">786</p>
-                  <p className="text-sm text-accent">(Low Risk)</p>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Excellent repayment history.
-                </p>
-              </Card>
+            <div className="relative">
+              {heroImage && (
+                <Image
+                  src={heroImage.imageUrl}
+                  alt={heroImage.description}
+                  width={600}
+                  height={400}
+                  className="mx-auto overflow-hidden rounded-xl object-cover"
+                  data-ai-hint={heroImage.imageHint}
+                />
+              )}
+              <div className="absolute -bottom-8 -right-8 z-10 hidden lg:block">
+                <Card className="w-64 rounded-xl bg-background/80 p-4 shadow-lg backdrop-blur-sm">
+                  <p className="text-sm font-semibold">AI Composite Score</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-3xl font-bold text-primary">786</p>
+                    <p className="text-sm text-green-600 font-semibold">(Low Risk)</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Excellent repayment history.
+                  </p>
+                </Card>
+              </div>
             </div>
           </div>
         </section>
