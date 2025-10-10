@@ -10,6 +10,14 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, UploadCloud, FileJson, IndianRupee } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { billParser, type BillParserOutput } from '@/ai/flows/bill-parser';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 export default function BillUpload() {
   const [file, setFile] = useState<File | null>(null);
