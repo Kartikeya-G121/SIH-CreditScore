@@ -105,15 +105,7 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} defaultValue="overview">
-      <TabsList className="mb-6 grid w-full grid-cols-1 sm:grid-cols-3 lg:grid-cols-5">
-        <TabsTrigger value="overview">Overview</TabsTrigger>
-        <TabsTrigger value="repayments">Repayments</TabsTrigger>
-        <TabsTrigger value="profile">Profile & Eligibility</TabsTrigger>
-        <TabsTrigger value="advice">Financial Advice</TabsTrigger>
-        <TabsTrigger value="bill-upload"><UploadCloud className='mr-2 h-4 w-4'/>Bill Upload</TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="overview" className="space-y-6">
+      <TabsContent value="overview" className="space-y-6 mt-0">
         <div className="grid gap-6 md:grid-cols-3">
           <Card className="md:col-span-1">
             <CardHeader>
@@ -187,7 +179,7 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
         </Card>
       </TabsContent>
       
-      <TabsContent value="repayments" className="space-y-6">
+      <TabsContent value="repayments" className="space-y-6 mt-0">
         <Card>
           <CardHeader>
             <CardTitle>Repayment Schedule</CardTitle>
@@ -245,7 +237,7 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
         </Card>
       </TabsContent>
       
-      <TabsContent value="profile" className="space-y-6">
+      <TabsContent value="profile" className="space-y-6 mt-0">
         <Card>
           <CardHeader>
             <CardTitle>Profile Information</CardTitle>
@@ -326,7 +318,7 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
         </Card>
       </TabsContent>
 
-       <TabsContent value="advice" className="space-y-6">
+       <TabsContent value="advice" className="space-y-6 mt-0">
           <Card>
             <CardHeader>
               <CardTitle>AI-Powered Financial Advice Feed</CardTitle>
@@ -348,7 +340,7 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
           </Card>
        </TabsContent>
       
-       <TabsContent value="bill-upload">
+       <TabsContent value="bill-upload" className="mt-0">
           <BillUpload onBillConfirmed={handleSaveBill} />
        </TabsContent>
 

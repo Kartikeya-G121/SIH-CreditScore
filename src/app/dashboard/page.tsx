@@ -24,6 +24,8 @@ import {
   BarChart3,
   Settings,
   HelpCircle,
+  Lightbulb,
+  UploadCloud,
 } from 'lucide-react';
 import { UserNav } from '@/components/layout/user-nav';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -36,7 +38,7 @@ function DashboardSidebar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const activeTab = searchParams.get('tab') || 'overview';
+  const activeTab = searchParams.get('tab') || (user?.role === 'beneficiary' ? 'overview' : user?.role === 'officer' ? 'dashboard' : 'analytics');
 
   const handleNav = (href: string) => {
     if (href.startsWith('#')) {
@@ -64,6 +66,16 @@ function DashboardSidebar() {
         id: 'profile',
         icon: <Users />,
         label: 'Profile',
+      },
+      {
+        id: 'advice',
+        icon: <Lightbulb />,
+        label: 'Financial Advice',
+      },
+      {
+        id: 'bill-upload',
+        icon: <UploadCloud />,
+        label: 'Bill Upload',
       },
     ],
     officer: [
@@ -167,7 +179,7 @@ export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tab = searchParams.get('tab') || 'overview';
+  const tab = searchParams.get('tab') || (user?.role === 'beneficiary' ? 'overview' : user?.role === 'officer' ? 'dashboard' : 'analytics');
 
 
   useEffect(() => {
