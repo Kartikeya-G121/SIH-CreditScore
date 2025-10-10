@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, UploadCloud, FileJson } from 'lucide-react';
+import { Loader2, UploadCloud, FileJson, IndianRupee } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { billParser, type BillParserOutput } from '@/ai/flows/bill-parser';
 
