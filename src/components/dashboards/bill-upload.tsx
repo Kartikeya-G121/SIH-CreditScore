@@ -19,7 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-export default function BillUpload() {
+export default function BillUpload({ onBillConfirmed }: { onBillConfirmed: (bill: BillParserOutput) => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [consent, setConsent] = useState(false);
@@ -107,15 +107,27 @@ export default function BillUpload() {
     }
   };
   
-  const handleReset = () => {
-      setFile(null);
-      setPreviewUrl(null);
+  const handleReset = (clearAll: boolean = false) => {
+      if (clearAll) {
+        setFile(null);
+        setPreviewUrl(null);
+        setConsent(false);
+      }
       setParsedData(null);
       setError(null);
-      setConsent(false);
       if (fileInputRef.current) {
           fileInputRef.current.value = "";
       }
+  }
+
+  const handleConfirm = () => {
+    if (!parsedData) return;
+    onBillConfirmed(parsedData);
+    toast({
+        title: "Bill Saved!",
+        description: "The bill has been added to your profile."
+    });
+    handleReset(true);
   }
 
   return (
@@ -164,7 +176,7 @@ export default function BillUpload() {
                 <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Parsing Bill...</>
               ) : "Parse Bill with AI"}
             </Button>
-            { (file || parsedData || error) && <Button variant="outline" onClick={handleReset}>Reset</Button> }
+            { (file || parsedData || error) && <Button variant="outline" onClick={() => handleReset(true)}>Reset</Button> }
           </div>
           
         </CardContent>
@@ -207,8 +219,9 @@ export default function BillUpload() {
                         ))}
                     </TableBody>
                 </Table>
-                 <div className="flex justify-end mt-4">
-                    <Button>Confirm and Add to Profile</Button>
+                 <div className="flex justify-end mt-4 gap-2">
+                    <Button variant="outline" onClick={() => handleReset(false)}>Re-scan</Button>
+                    <Button onClick={handleConfirm}>Confirm and Add to Profile</Button>
                 </div>
             </CardContent>
         </Card>

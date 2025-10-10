@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -25,6 +26,7 @@ import {
   MoreHorizontal,
   ThumbsUp,
   UploadCloud,
+  FileText,
 } from 'lucide-react';
 
 import { MOCK_BENEFICIARY_DATA, type User } from '@/lib/data';
@@ -57,6 +59,7 @@ import {
 } from '@/components/ui/chart';
 import { useRouter } from 'next/navigation';
 import BillUpload from './bill-upload';
+import { type BillParserOutput } from '@/ai/flows/bill-parser';
 
 const chartConfig: ChartConfig = {
   essential: {
@@ -77,6 +80,8 @@ const repaymentChartConfig: ChartConfig = {
 export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activeTab?: string }) {
   const { user } = useAuth();
   const router = useRouter();
+  const [savedBills, setSavedBills] = useState<BillParserOutput[]>([]);
+
   const {
     creditScore,
     riskLevel,
@@ -91,6 +96,10 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
   
   const handleTabChange = (value: string) => {
     router.push(`/dashboard?tab=${value}`, { scroll: false });
+  };
+  
+  const handleSaveBill = (bill: BillParserOutput) => {
+    setSavedBills(prev => [...prev, bill]);
   };
 
 
@@ -256,6 +265,53 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
              <Button variant="outline">Edit Profile</Button>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Saved Bills</CardTitle>
+            <CardDescription>Bills you have uploaded for consumption analysis.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {savedBills.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                You haven&apos;t saved any bills yet. Upload one in the &apos;Bill Upload&apos; tab.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {savedBills.map((bill, index) => (
+                  <Card key={index} className="bg-muted/50">
+                    <CardHeader className="pb-2">
+                       <CardTitle className="text-lg flex items-center justify-between">
+                         <span>{bill.vendorName}</span>
+                         <span className="text-lg font-bold flex items-center"><IndianRupee className="inline h-4 w-4 mr-1"/>{bill.totalAmount}</span>
+                       </CardTitle>
+                       <CardDescription>{bill.transactionDate}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                       <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Item</TableHead>
+                              <TableHead className="text-right">Amount</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {bill.lineItems.map((item, i) => (
+                              <TableRow key={i}>
+                                <TableCell>{item.description}</TableCell>
+                                <TableCell className="text-right flex items-center justify-end"><IndianRupee className="inline h-4 w-4 mr-1"/>{item.amount}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                       </Table>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
          <Card>
           <CardHeader>
             <CardTitle>Language Preference</CardTitle>
@@ -293,7 +349,7 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
        </TabsContent>
       
        <TabsContent value="bill-upload">
-          <BillUpload />
+          <BillUpload onBillConfirmed={handleSaveBill} />
        </TabsContent>
 
     </Tabs>
