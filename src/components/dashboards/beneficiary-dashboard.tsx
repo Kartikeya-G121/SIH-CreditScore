@@ -24,6 +24,7 @@ import {
   Lightbulb,
   MoreHorizontal,
   ThumbsUp,
+  UploadCloud,
 } from 'lucide-react';
 
 import { MOCK_BENEFICIARY_DATA, type User } from '@/lib/data';
@@ -55,6 +56,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { useRouter } from 'next/navigation';
+import BillUpload from './bill-upload';
 
 const chartConfig: ChartConfig = {
   essential: {
@@ -94,11 +96,12 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} defaultValue="overview">
-      <TabsList className="mb-6 grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <TabsList className="mb-6 grid w-full grid-cols-1 sm:grid-cols-3 lg:grid-cols-5">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="repayments">Repayments</TabsTrigger>
         <TabsTrigger value="profile">Profile & Eligibility</TabsTrigger>
         <TabsTrigger value="advice">Financial Advice</TabsTrigger>
+        <TabsTrigger value="bill-upload"><UploadCloud className='mr-2 h-4 w-4'/>Bill Upload</TabsTrigger>
       </TabsList>
       
       <TabsContent value="overview" className="space-y-6">
@@ -287,6 +290,10 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
               ))}
             </CardContent>
           </Card>
+       </TabsContent>
+      
+       <TabsContent value="bill-upload">
+          <BillUpload />
        </TabsContent>
 
     </Tabs>
