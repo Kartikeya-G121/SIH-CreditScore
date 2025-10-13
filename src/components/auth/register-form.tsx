@@ -45,16 +45,16 @@ type BillCategory = BillParserOutput['category'];
 const formSchema = z.discriminatedUnion('role', [
   z.object({
     role: z.literal('beneficiary'),
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    name: z.string().min(1, { message: 'Name is required.' }),
     email: z.string().email({ message: 'Please enter a valid email.' }),
     age: z.coerce.number().min(18, { message: 'You must be at least 18.'}).max(100),
-    address: z.string().min(10, { message: 'Please enter a full address.' }),
+    address: z.string().min(1, { message: 'Address is required.' }),
     location: z.string().min(2, { message: 'City/Town/Village is required.' }),
     pincode: z.string().regex(/^\d{6}$/, { message: 'Please enter a valid 6-digit Indian pincode.' }),
-    occupation: z.string().min(2, { message: 'Occupation is required.' }),
-    income: z.coerce.number().min(0, { message: 'Income cannot be negative.' }),
+    occupation: z.string().min(1, { message: 'Occupation is required.' }),
+    income: z.coerce.number().min(0, { message: 'Income is required and cannot be negative.' }),
     creditHistory: z.string().min(10, { message: 'Please describe your credit history.'}),
-    loanAmount: z.coerce.number().min(1000, { message: 'Loan amount must be at least 1000.' }),
+    loanAmount: z.coerce.number().min(1, { message: 'Desired loan amount is required.' }),
   }),
   z.object({
     role: z.literal('officer'),
