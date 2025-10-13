@@ -36,6 +36,7 @@ import { MOCK_BENEFICIARIES_LIST } from '@/lib/data';
 import { StatCard } from '../shared/stat-card';
 import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '../ui/chart';
+import { useLanguage } from '@/contexts/language-context';
 
 const riskVariant: { [key: string]: 'default' | 'destructive' | 'outline' } = {
   Low: 'default',
@@ -49,6 +50,7 @@ const riskColorClass = {
 };
 
 export default function OfficerDashboard() {
+  const { t } = useLanguage();
   const geoData = [
     { name: 'Maharashtra', repayment: 98 },
     { name: 'Gujarat', repayment: 92 },
@@ -87,23 +89,23 @@ export default function OfficerDashboard() {
       <Card>
         <CardHeader className='flex-row items-center justify-between'>
           <div>
-            <CardTitle>Beneficiaries</CardTitle>
+            <CardTitle>{t('officer_beneficiaries_title')}</CardTitle>
             <CardDescription>
-              A list of beneficiaries under your purview.
+              {t('officer_beneficiaries_desc')}
             </CardDescription>
           </div>
-          <Button variant="outline"><Filter className="mr-2 h-4 w-4"/> Filter</Button>
+          <Button variant="outline"><Filter className="mr-2 h-4 w-4"/> {t('officer_filter')}</Button>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Beneficiary</TableHead>
-                <TableHead>Region</TableHead>
-                <TableHead>AI Score</TableHead>
-                <TableHead>Risk Level</TableHead>
-                <TableHead>Loan Stage</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t('officer_table_beneficiary')}</TableHead>
+                <TableHead>{t('officer_table_region')}</TableHead>
+                <TableHead>{t('officer_table_ai_score')}</TableHead>
+                <TableHead>{t('officer_table_risk')}</TableHead>
+                <TableHead>{t('officer_table_loan_stage')}</TableHead>
+                <TableHead className="text-right">{t('officer_table_actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

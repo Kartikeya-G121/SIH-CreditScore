@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import { MOCK_USERS } from '@/lib/data';
+import { useLanguage } from '@/contexts/language-context';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -22,6 +23,7 @@ export function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -56,7 +58,7 @@ export function LoginForm() {
           <SelectContent>
             {MOCK_USERS.map((user) => (
               <SelectItem key={user.id} value={user.email}>
-                {user.name} ({user.role})
+                {user.name} ({t(user.role)})
               </SelectItem>
             ))}
           </SelectContent>
@@ -64,13 +66,11 @@ export function LoginForm() {
       </div>
       <Button type="submit" className="w-full" disabled={isLoading || !email}>
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Login
+        {t('login')}
       </Button>
       <Button variant="outline" className="w-full" type="button">
-        Login with Google
+        {t('login_with_google')}
       </Button>
     </form>
   );
 }
-
-    

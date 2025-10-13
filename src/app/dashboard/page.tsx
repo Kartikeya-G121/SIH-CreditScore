@@ -40,12 +40,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useLanguage } from '@/contexts/language-context';
 
 function DashboardSidebar() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const activeTab = searchParams.get('tab') || (user?.role === 'beneficiary' ? 'overview' : user?.role === 'officer' ? 'dashboard' : 'analytics');
 
   const handleNav = (href: string) => {
@@ -63,51 +65,51 @@ function DashboardSidebar() {
       {
         id: 'overview',
         icon: <LayoutDashboard />,
-        label: 'Overview',
+        label: t('sidebar_overview'),
       },
       {
         id: 'repayments',
         icon: <BarChart3 />,
-        label: 'Repayments',
+        label: t('sidebar_repayments'),
       },
        {
         id: 'profile',
         icon: <Users />,
-        label: 'Profile',
+        label: t('sidebar_profile'),
       },
       {
         id: 'advice',
         icon: <Lightbulb />,
-        label: 'Financial Advice',
+        label: t('sidebar_financial_advice'),
       },
       {
         id: 'bill-upload',
         icon: <UploadCloud />,
-        label: 'Bill Upload',
+        label: t('sidebar_bill_upload'),
       },
     ],
     officer: [
       {
         id: 'dashboard',
         icon: <LayoutDashboard />,
-        label: 'Dashboard',
+        label: t('sidebar_dashboard'),
       },
       {
         id: 'beneficiaries',
         icon: <Users />,
-        label: 'Beneficiaries',
+        label: t('sidebar_beneficiaries'),
       },
     ],
     admin: [
       {
         id: 'analytics',
         icon: <LayoutDashboard />,
-        label: 'Analytics',
+        label: t('sidebar_analytics'),
       },
       {
         id: 'user-management',
         icon: <Users />,
-        label: 'User Management',
+        label: t('sidebar_user_management'),
       },
     ],
   };
@@ -139,13 +141,13 @@ function DashboardSidebar() {
            <SidebarMenuItem>
              <SidebarMenuButton onClick={() => handleNav('/help')}>
                <HelpCircle />
-               <span>Help</span>
+               <span>{t('sidebar_help')}</span>
              </SidebarMenuButton>
            </SidebarMenuItem>
             <SidebarMenuItem>
              <SidebarMenuButton onClick={() => handleNav('/settings')}>
                <Settings />
-               <span>Settings</span>
+               <span>{t('sidebar_settings')}</span>
              </SidebarMenuButton>
            </SidebarMenuItem>
         </SidebarMenu>
@@ -158,7 +160,7 @@ function DashboardSidebar() {
             </Avatar>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-sidebar-foreground">{user.name}</span>
-              <span className="text-xs text-muted-foreground">{user.role}</span>
+              <span className="text-xs text-muted-foreground">{t(user.role)}</span>
             </div>
           </div>
         )}
@@ -168,13 +170,23 @@ function DashboardSidebar() {
 }
 
 function LanguageSwitcher() {
+    const { setLanguage } = useLanguage();
     const { toast } = useToast();
 
-    const handleLanguageChange = (lang: string) => {
-        toast({
-            title: 'Language Switched',
-            description: `Language has been set to ${lang}.`,
-        });
+    const handleLanguageChange = (lang: 'en' | 'hi' | 'bn' | 'ta') => {
+        if (lang === 'en' || lang === 'hi') {
+          setLanguage(lang);
+          toast({
+              title: 'Language Switched',
+              description: `Language has been set to ${lang === 'en' ? 'English' : 'Hindi'}.`,
+          });
+        } else {
+           toast({
+                title: 'Language Not Available',
+                description: 'This language is not yet supported in the prototype.',
+                variant: 'destructive'
+            });
+        }
     };
 
     return (
@@ -186,16 +198,16 @@ function LanguageSwitcher() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => handleLanguageChange('English')}>
+                <DropdownMenuItem onSelect={() => handleLanguageChange('en')}>
                     English
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => handleLanguageChange('Hindi')}>
+                <DropdownMenuItem onSelect={() => handleLanguageChange('hi')}>
                     हिंदी
                 </DropdownMenuItem>
-                 <DropdownMenuItem onSelect={() => handleLanguageChange('Bengali')}>
+                 <DropdownMenuItem onSelect={() => handleLanguageChange('bn')}>
                     বাংলা
                 </DropdownMenuItem>
-                 <DropdownMenuItem onSelect={() => handleLanguageChange('Tamil')}>
+                 <DropdownMenuItem onSelect={() => handleLanguageChange('ta')}>
                     தமிழ்
                 </DropdownMenuItem>
             </DropdownMenuContent>
@@ -205,14 +217,15 @@ function LanguageSwitcher() {
 
 function DashboardHeader() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const roleHeadings = {
-    beneficiary: "Beneficiary Dashboard",
-    officer: "Officer Dashboard",
-    admin: "Admin Analytics"
+    beneficiary: "beneficiary_dashboard",
+    officer: "officer_dashboard",
+    admin: "admin_dashboard"
   }
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
-      <h1 className="text-xl font-semibold">{user ? roleHeadings[user.role] : 'Dashboard'}</h1>
+      <h1 className="text-xl font-semibold">{user ? t(roleHeadings[user.role]) : 'Dashboard'}</h1>
       <div className="flex items-center gap-2">
         <LanguageSwitcher />
         <UserNav />

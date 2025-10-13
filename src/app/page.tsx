@@ -1,3 +1,5 @@
+
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -24,8 +26,10 @@ import {
 import { Logo } from '@/components/layout/logo';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import heroImage from '@/lib/rupixen-Q59HmzK38eQ-unsplash.jpg';
+import { useLanguage } from '@/contexts/language-context';
 
 function LandingHeader() {
+  const { t } = useLanguage();
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center">
@@ -37,25 +41,25 @@ function LandingHeader() {
             href="#features"
             className="transition-colors hover:text-primary"
           >
-            Features
+            {t('features')}
           </Link>
           <Link href="#partners" className="transition-colors hover:text-primary">
-            Partners
+            {t('partners')}
           </Link>
           <Link
             href="/dashboard"
             className="transition-colors hover:text-primary"
           >
-            Dashboard
+            {t('dashboard')}
           </Link>
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
           <Button variant="ghost" asChild>
-            <Link href="/login">Login</Link>
+            <Link href="/login">{t('login')}</Link>
           </Button>
           <Button asChild>
             <Link href="/register">
-              Register <ArrowRight className="ml-2 h-4 w-4" />
+              {t('register')} <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>
@@ -65,6 +69,7 @@ function LandingHeader() {
 }
 
 export default function Home() {
+  const { t } = useLanguage();
   const partners = PlaceHolderImages.filter((img) =>
     img.id.startsWith('partner-')
   );
@@ -78,16 +83,15 @@ export default function Home() {
           <div className="container grid grid-cols-1 items-center gap-8 py-20 md:grid-cols-2 lg:py-32">
             <div className="space-y-6 text-center md:text-left">
               <h1 className="font-headline text-4xl font-bold tracking-tighter md:text-5xl lg:text-6xl">
-                Empowering India through AI-Driven Credit Scoring.
+                {t('landing_hero_title')}
               </h1>
               <p className="mx-auto max-w-[700px] text-lg text-gray-200 md:mx-0">
-                Inclusive finance for every entrepreneur and dreamer. Our platform
-                radiates trust, inclusivity, and digital empowerment.
+                {t('landing_hero_subtitle')}
               </p>
               <div className="space-x-4">
                 <Button size="lg" asChild variant="secondary">
                   <Link href="/register">
-                    Get Started <ArrowRight className="ml-2" />
+                    {t('get_started')} <ArrowRight className="ml-2" />
                   </Link>
                 </Button>
               </div>

@@ -60,6 +60,7 @@ import {
 import { useRouter } from 'next/navigation';
 import BillUpload from './bill-upload';
 import { type BillParserOutput } from '@/ai/flows/bill-parser';
+import { useLanguage } from '@/contexts/language-context';
 
 const chartConfig: ChartConfig = {
   essential: {
@@ -80,6 +81,7 @@ const repaymentChartConfig: ChartConfig = {
 export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activeTab?: string }) {
   const { user } = useAuth();
   const router = useRouter();
+  const { t } = useLanguage();
   const [savedBills, setSavedBills] = useState<BillParserOutput[]>([]);
 
   const {
@@ -109,8 +111,8 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
         <div className="grid gap-6 md:grid-cols-3">
           <Card className="md:col-span-1">
             <CardHeader>
-              <CardTitle>Welcome, {user?.name.split(' ')[0]}!</CardTitle>
-              <CardDescription>Your financial summary.</CardDescription>
+              <CardTitle>{t('welcome_message')}, {user?.name.split(' ')[0]}!</CardTitle>
+              <CardDescription>{t('financial_summary')}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center text-center">
               <div className="relative h-40 w-40">
@@ -133,19 +135,19 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-4xl font-bold text-primary">{creditScore}</span>
-                  <span className="text-sm font-medium text-muted-foreground">Credit Score</span>
+                  <span className="text-sm font-medium text-muted-foreground">{t('credit_score')}</span>
                 </div>
               </div>
               <Badge variant={riskLevel === 'Low' ? 'default' : 'destructive'} className={`mt-4 ${riskLevel === 'Low' ? 'bg-green-600 text-white' : ''}`}>
-                {riskLevel} Risk
+                {riskLevel} {t('risk_level')}
               </Badge>
             </CardContent>
           </Card>
 
           <Card className="md:col-span-2">
             <CardHeader>
-              <CardTitle>AI Score & Insights</CardTitle>
-              <CardDescription>Factors influencing your credit score.</CardDescription>
+              <CardTitle>{t('ai_score_insights')}</CardTitle>
+              <CardDescription>{t('score_factors')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {insights.map((insight, i) => (
@@ -160,8 +162,8 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
 
         <Card>
             <CardHeader>
-                <CardTitle>Consumption Behavior Index</CardTitle>
-                <CardDescription>Your spending habits over the last 7 months.</CardDescription>
+                <CardTitle>{t('consumption_behavior')}</CardTitle>
+                <CardDescription>{t('spending_habits')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig} className="h-[300px] w-full">
@@ -182,8 +184,8 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
       <TabsContent value="repayments" className="space-y-6 mt-0">
         <Card>
           <CardHeader>
-            <CardTitle>Repayment Schedule</CardTitle>
-            <CardDescription>Your upcoming and past payments.</CardDescription>
+            <CardTitle>{t('repayment_schedule')}</CardTitle>
+            <CardDescription>{t('upcoming_payments')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -218,8 +220,8 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
         
         <Card>
             <CardHeader>
-                <CardTitle>Repayment Trends</CardTitle>
-                <CardDescription>Your payment performance over time.</CardDescription>
+                <CardTitle>{t('repayment_trends')}</CardTitle>
+                <CardDescription>{t('payment_performance')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={repaymentChartConfig} className="h-[300px] w-full">
@@ -240,8 +242,8 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
       <TabsContent value="profile" className="space-y-6 mt-0">
         <Card>
           <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>Manage your personal and contact details.</CardDescription>
+            <CardTitle>{t('profile_information')}</CardTitle>
+            <CardDescription>{t('manage_details')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
              <div className="flex items-center space-x-4">
@@ -254,19 +256,19 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
                   <p className="text-sm text-muted-foreground">{user?.email}</p>
                </div>
              </div>
-             <Button variant="outline">Edit Profile</Button>
+             <Button variant="outline">{t('edit_profile')}</Button>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Saved Bills</CardTitle>
-            <CardDescription>Bills you have uploaded for consumption analysis.</CardDescription>
+            <CardTitle>{t('saved_bills')}</CardTitle>
+            <CardDescription>{t('saved_bills_desc')}</CardDescription>
           </CardHeader>
           <CardContent>
             {savedBills.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">
-                You haven&apos;t saved any bills yet. Upload one in the &apos;Bill Upload&apos; tab.
+                {t('no_bills_saved')}
               </p>
             ) : (
               <div className="space-y-4">
@@ -308,8 +310,8 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
        <TabsContent value="advice" className="space-y-6 mt-0">
           <Card>
             <CardHeader>
-              <CardTitle>AI-Powered Financial Advice Feed</CardTitle>
-              <CardDescription>Personalized tips for rural entrepreneurs like you.</CardDescription>
+              <CardTitle>{t('ai_financial_advice')}</CardTitle>
+              <CardDescription>{t('personalized_tips')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {financialAdvice.map(item => (

@@ -17,6 +17,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
+import { useLanguage } from '@/contexts/language-context';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -30,11 +31,11 @@ export function ChatbotModal({
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 }) {
+  const { t } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content:
-        'Hello! I am Nidhi, your financial literacy assistant. How can I help you today?',
+      content: t('chatbot_greeting'),
     },
   ]);
   const [input, setInput] = useState('');
@@ -92,9 +93,9 @@ export function ChatbotModal({
       <Card className="w-[350px] h-[500px] flex flex-col shadow-2xl rounded-2xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Bot /> Ask Nidhi
+            <Bot /> {t('ask_nidhi')}
           </CardTitle>
-           <CardDescription>Your AI Financial Literacy Assistant</CardDescription>
+           <CardDescription>{t('ai_assistant_desc')}</CardDescription>
         </CardHeader>
         <CardContent className="flex-1 overflow-hidden">
           <ScrollArea className="h-full" ref={scrollAreaRef}>
@@ -153,7 +154,7 @@ export function ChatbotModal({
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask a question..."
+              placeholder={t('ask_a_question')}
               disabled={isLoading}
             />
             <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>

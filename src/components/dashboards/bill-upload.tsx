@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useLanguage } from '@/contexts/language-context';
 
 export default function BillUpload({ onBillConfirmed }: { onBillConfirmed: (bill: BillParserOutput) => void }) {
   const [file, setFile] = useState<File | null>(null);
@@ -28,6 +29,7 @@ export default function BillUpload({ onBillConfirmed }: { onBillConfirmed: (bill
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -134,9 +136,9 @@ export default function BillUpload({ onBillConfirmed }: { onBillConfirmed: (bill
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Upload Your Bill</CardTitle>
+          <CardTitle>{t('upload_your_bill')}</CardTitle>
           <CardDescription>
-            Upload an image of your bill for AI-powered consumption analysis. This helps us build a more accurate financial profile for you.
+            {t('upload_bill_desc')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -154,8 +156,8 @@ export default function BillUpload({ onBillConfirmed }: { onBillConfirmed: (bill
               className="flex flex-col items-center justify-center space-y-2 border-2 border-dashed border-muted-foreground/50 rounded-lg p-12 text-center cursor-pointer hover:border-primary transition-colors"
             >
               <UploadCloud className="h-12 w-12 text-muted-foreground" />
-              <p className="font-semibold">Click to upload or drag & drop</p>
-              <p className="text-sm text-muted-foreground">PNG, JPG, or WEBP (max. 4MB)</p>
+              <p className="font-semibold">{t('click_to_upload')}</p>
+              <p className="text-sm text-muted-foreground">{t('file_specs')}</p>
             </div>
           ) : (
              <div className="relative w-full max-w-sm mx-auto">
@@ -166,17 +168,17 @@ export default function BillUpload({ onBillConfirmed }: { onBillConfirmed: (bill
           <div className="flex items-center space-x-2">
             <Checkbox id="terms" checked={consent} onCheckedChange={(checked) => setConsent(checked as boolean)} />
             <Label htmlFor="terms" className="text-sm text-muted-foreground">
-              I consent to the use of this bill for automated consumption analysis to improve my credit profile.
+              {t('consent_text')}
             </Label>
           </div>
           
           <div className="flex gap-4">
             <Button onClick={handleSubmit} disabled={isLoading || !file || !consent}>
               {isLoading ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Parsing Bill...</>
-              ) : "Parse Bill with AI"}
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('parsing_bill')}</>
+              ) : t('parse_bill')}
             </Button>
-            { (file || parsedData || error) && <Button variant="outline" onClick={() => handleReset(true)}>Reset</Button> }
+            { (file || parsedData || error) && <Button variant="outline" onClick={() => handleReset(true)}>{t('reset')}</Button> }
           </div>
           
         </CardContent>
@@ -192,17 +194,17 @@ export default function BillUpload({ onBillConfirmed }: { onBillConfirmed: (bill
       {parsedData && (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center"><FileJson className="mr-2 h-5 w-5"/> Parsed Bill Data</CardTitle>
-                <CardDescription>Verify the information extracted by the AI.</CardDescription>
+                <CardTitle className="flex items-center"><FileJson className="mr-2 h-5 w-5"/> {t('parsed_bill_data')}</CardTitle>
+                <CardDescription>{t('verify_parsed_data')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <p><strong>Vendor:</strong> {parsedData.vendorName}</p>
-                    <p><strong>Date:</strong> {parsedData.transactionDate}</p>
-                    <p><strong>Total Amount:</strong> <IndianRupee className="inline h-4 w-4" />{parsedData.totalAmount}</p>
-                    <p><strong>Category:</strong> {parsedData.category}</p>
+                    <p><strong>{t('vendor')}:</strong> {parsedData.vendorName}</p>
+                    <p><strong>{t('date')}:</strong> {parsedData.transactionDate}</p>
+                    <p><strong>{t('total_amount')}:</strong> <IndianRupee className="inline h-4 w-4" />{parsedData.totalAmount}</p>
+                    <p><strong>{t('category')}:</strong> {parsedData.category}</p>
                 </div>
-                <h4 className="font-semibold mt-4 mb-2">Line Items:</h4>
+                <h4 className="font-semibold mt-4 mb-2">{t('line_items')}</h4>
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -220,8 +222,8 @@ export default function BillUpload({ onBillConfirmed }: { onBillConfirmed: (bill
                     </TableBody>
                 </Table>
                  <div className="flex justify-end mt-4 gap-2">
-                    <Button variant="outline" onClick={() => handleReset(false)}>Re-scan</Button>
-                    <Button onClick={handleConfirm}>Confirm and Add to Profile</Button>
+                    <Button variant="outline" onClick={() => handleReset(false)}>{t('re_scan')}</Button>
+                    <Button onClick={handleConfirm}>{t('confirm_and_add')}</Button>
                 </div>
             </CardContent>
         </Card>

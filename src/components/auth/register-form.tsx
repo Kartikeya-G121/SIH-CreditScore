@@ -46,6 +46,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { aiCreditScore, type AiCreditScoreOutput } from '@/ai/ai-credit-scoring';
 import { billParser, type BillParserOutput } from '@/ai/flows/bill-parser';
 import Image from 'next/image';
+import { useLanguage } from '@/contexts/language-context';
 
 type BillCategory = BillParserOutput['category'];
 
@@ -78,6 +79,7 @@ export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const [bills, setBills] = useState<BillParserOutput[]>([]);
   const [currentFile, setCurrentFile] = useState<File | null>(null);
@@ -243,9 +245,9 @@ export function RegisterForm() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>{t('name_label')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Your Name" {...field} />
+                  <Input placeholder={t('name_placeholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -256,9 +258,9 @@ export function RegisterForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('email_label')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="m@example.com" {...field} />
+                  <Input placeholder={t('email_placeholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -269,16 +271,16 @@ export function RegisterForm() {
             name="role"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Role</FormLabel>
+                <FormLabel>{t('role_label')}</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select your role" />
+                      <SelectValue placeholder={t('role_placeholder')} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="beneficiary">Beneficiary</SelectItem>
-                    <SelectItem value="officer">Officer</SelectItem>
+                    <SelectItem value="beneficiary">{t('beneficiary')}</SelectItem>
+                    <SelectItem value="officer">{t('officer')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -293,7 +295,7 @@ export function RegisterForm() {
                 name="age"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Age</FormLabel>
+                    <FormLabel>{t('age_label')}</FormLabel>
                     <FormControl>
                       {/* @ts-ignore */}
                       <Input type="number" {...field} />
@@ -307,10 +309,10 @@ export function RegisterForm() {
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Location (City)</FormLabel>
+                    <FormLabel>{t('location_label')}</FormLabel>
                     <FormControl>
                       {/* @ts-ignore */}
-                      <Input placeholder="e.g., Delhi" {...field} />
+                      <Input placeholder={t('location_placeholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -321,10 +323,10 @@ export function RegisterForm() {
                 name="occupation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Occupation</FormLabel>
+                    <FormLabel>{t('occupation_label')}</FormLabel>
                     <FormControl>
                       {/* @ts-ignore */}
-                      <Input placeholder="e.g., Farmer, Artisan" {...field} />
+                      <Input placeholder={t('occupation_placeholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -335,7 +337,7 @@ export function RegisterForm() {
                 name="income"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Monthly Income (INR)</FormLabel>
+                    <FormLabel>{t('income_label')}</FormLabel>
                     <FormControl>
                       {/* @ts-ignore */}
                       <Input type="number" {...field} />
@@ -349,13 +351,13 @@ export function RegisterForm() {
                 name="creditHistory"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Credit History</FormLabel>
+                    <FormLabel>{t('credit_history_label')}</FormLabel>
                     <FormControl>
                       {/* @ts-ignore */}
-                      <Input placeholder="e.g., Paid all loans on time" {...field} />
+                      <Input placeholder={t('credit_history_placeholder')} {...field} />
                     </FormControl>
                     <FormDescription>
-                      Briefly describe your past loans or credit card usage.
+                      {t('credit_history_desc')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -366,7 +368,7 @@ export function RegisterForm() {
                 name="loanAmount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Desired Loan Amount (INR)</FormLabel>
+                    <FormLabel>{t('loan_amount_label')}</FormLabel>
                     <FormControl>
                        {/* @ts-ignore */}
                       <Input type="number" {...field} />
@@ -378,15 +380,15 @@ export function RegisterForm() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Upload Utility Bills (Optional)</CardTitle>
+                    <CardTitle>{t('upload_bills_title')}</CardTitle>
                     <CardDescription>
-                        Upload bills like electricity, mobile, or others to help us build a more accurate financial profile for you. You can add multiple bills.
+                        {t('upload_bills_desc')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {bills.length > 0 && (
                         <div className="space-y-2">
-                            <h4 className="font-medium text-sm">Added Bills:</h4>
+                            <h4 className="font-medium text-sm">{t('added_bills')}</h4>
                             <div className="flex flex-wrap gap-2">
                             {bills.map((bill, index) => (
                                 <div key={index} className="flex items-center gap-2 bg-muted p-2 rounded-md text-sm">
@@ -398,10 +400,10 @@ export function RegisterForm() {
                         </div>
                     )}
                     <div className="space-y-2">
-                        <Label htmlFor="bill-category">Bill Category</Label>
+                        <Label htmlFor="bill-category">{t('bill_category')}</Label>
                         <Select onValueChange={(value) => setBillCategory(value as BillCategory)} value={billCategory} disabled={!!parsedData}>
                             <SelectTrigger id="bill-category">
-                                <SelectValue placeholder="Select bill type" />
+                                <SelectValue placeholder={t('select_bill_type')} />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="Electricity">Electricity</SelectItem>
@@ -429,8 +431,8 @@ export function RegisterForm() {
                         className="flex flex-col items-center justify-center space-y-2 border-2 border-dashed border-muted-foreground/50 rounded-lg p-12 text-center cursor-pointer hover:border-primary transition-colors"
                         >
                         <UploadCloud className="h-12 w-12 text-muted-foreground" />
-                        <p className="font-semibold">Click to upload a bill</p>
-                        <p className="text-sm text-muted-foreground">PNG, JPG, or WEBP (max. 4MB)</p>
+                        <p className="font-semibold">{t('click_to_upload')}</p>
+                        <p className="text-sm text-muted-foreground">{t('file_specs')}</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
@@ -441,8 +443,8 @@ export function RegisterForm() {
                             {currentFile && !parsedData && (
                                 <Button onClick={handleParse} disabled={isParsing || !billCategory} className="w-full">
                                     {isParsing ? (
-                                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Parsing Bill...</>
-                                    ) : "Parse Bill with AI"}
+                                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('parsing_bill')}</>
+                                    ) : t('parse_bill')}
                                 </Button>
                             )}
                         </div>
@@ -458,16 +460,16 @@ export function RegisterForm() {
 
                     {parsedData && (
                         <div className="border rounded-lg p-4 space-y-4">
-                            <h3 className="font-semibold">Verify Extracted Data</h3>
+                            <h3 className="font-semibold">{t('verify_parsed_data')}</h3>
                             <div className="grid grid-cols-2 gap-2 text-sm">
-                                <p><strong>Vendor:</strong> {parsedData.vendorName}</p>
-                                <p><strong>Date:</strong> {parsedData.transactionDate}</p>
-                                <p><strong>Total:</strong> <IndianRupee className="inline h-3 w-3"/>{parsedData.totalAmount}</p>
-                                <p><strong>Category:</strong> {billCategory} <span className="text-muted-foreground text-xs">(AI detected: {parsedData.category})</span></p>
+                                <p><strong>{t('vendor')}:</strong> {parsedData.vendorName}</p>
+                                <p><strong>{t('date')}:</strong> {parsedData.transactionDate}</p>
+                                <p><strong>{t('total_amount')}:</strong> <IndianRupee className="inline h-3 w-3"/>{parsedData.totalAmount}</p>
+                                <p><strong>{t('category')}:</strong> {billCategory} <span className="text-muted-foreground text-xs">(AI detected: {parsedData.category})</span></p>
                             </div>
                             <div className="flex justify-end gap-2">
-                                <Button variant="outline" onClick={handleResetUpload}>Cancel</Button>
-                                <Button onClick={handleConfirmBill}>Confirm & Add Bill</Button>
+                                <Button variant="outline" onClick={handleResetUpload}>{t('re_scan')}</Button>
+                                <Button onClick={handleConfirmBill}>{t('confirm_and_add')}</Button>
                             </div>
                         </div>
                     )}
@@ -482,7 +484,7 @@ export function RegisterForm() {
             ) : (
              <Sparkles className="mr-2 h-4 w-4" />
             )}
-            Create Account
+            {t('create_account_button')}
           </Button>
         </form>
       </Form>
