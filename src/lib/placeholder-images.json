@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "hero",
-      "description": "An illustration of an empowered Indian woman with symbols of finance, AI, and credit scoring.",
-      "imageUrl": "https://picsum.photos/seed/empowered-finance/600/400",
-      "imageHint": "empowered woman illustration"
+      "description": "A modern office setting in India with people working on laptops, symbolizing financial technology and progress.",
+      "imageUrl": "https://picsum.photos/seed/finance-tech-india/600/400",
+      "imageHint": "financial technology"
     },
     {
       "id": "partner-nbcfdc",
