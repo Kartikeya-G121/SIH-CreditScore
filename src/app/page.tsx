@@ -103,18 +103,6 @@ export default function Home() {
                   data-ai-hint={heroImage.imageHint}
                 />
               )}
-              <div className="absolute -bottom-8 -right-8 z-10 hidden lg:block animate-in fade-in zoom-in-90 duration-500">
-                <Card className="w-64 rounded-xl bg-background/80 p-4 shadow-lg backdrop-blur-sm">
-                  <p className="text-sm font-semibold">AI Composite Score</p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-3xl font-bold text-primary">786</p>
-                    <p className="text-sm text-green-600 font-semibold">(Low Risk)</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Excellent repayment history.
-                  </p>
-                </Card>
-              </div>
             </div>
           </div>
         </section>
