@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "hero",
-      "description": "A smiling rural entrepreneur using a mobile phone for a transaction.",
-      "imageUrl": "https://picsum.photos/seed/hero-credit/600/400",
-      "imageHint": "happy entrepreneur phone"
+      "description": "An illustration of an empowered Indian woman with symbols of finance, AI, and credit scoring.",
+      "imageUrl": "https://picsum.photos/seed/empowered-finance/600/400",
+      "imageHint": "empowered woman illustration"
     },
     {
       "id": "partner-nbcfdc",
