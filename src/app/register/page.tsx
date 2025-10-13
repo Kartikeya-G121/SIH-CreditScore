@@ -12,7 +12,7 @@ import {
 export default function RegisterPage() {
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-muted/40 p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-lg">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <Logo />
@@ -35,3 +35,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+    

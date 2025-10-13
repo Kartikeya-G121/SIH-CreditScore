@@ -10,7 +10,7 @@ export type User = {
 export const MOCK_USERS: User[] = [
   {
     id: 'usr_001',
-    name: 'Aarav Sharma',
+    name: 'Aarav Sharma (Demo)',
     email: 'beneficiary@example.com',
     avatar: 'https://i.pravatar.cc/150?u=usr_001',
     role: 'beneficiary',
@@ -18,7 +18,7 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: 'usr_002',
-    name: 'Priya Singh',
+    name: 'Priya Singh (Demo)',
     email: 'officer@example.com',
     avatar: 'https://i.pravatar.cc/150?u=usr_002',
     role: 'officer',
@@ -26,11 +26,27 @@ export const MOCK_USERS: User[] = [
   },
   {
     id: 'usr_003',
-    name: 'Rohan Gupta',
+    name: 'Rohan Gupta (Demo)',
     email: 'admin@example.com',
     avatar: 'https://i.pravatar.cc/150?u=usr_003',
     role: 'admin',
     region: 'National',
+  },
+   {
+    id: 'usr_004',
+    name: 'Sunita Devi',
+    email: 'sunita.d@example.com',
+    avatar: 'https://i.pravatar.cc/150?u=usr_004',
+    role: 'beneficiary',
+    region: 'Bihar',
+  },
+   {
+    id: 'usr_005',
+    name: 'Amit Kumar',
+    email: 'amit.k@example.com',
+    avatar: 'https://i.pravatar.cc/150?u=usr_005',
+    role: 'beneficiary',
+    region: 'Uttar Pradesh',
   },
 ];
 
@@ -105,3 +121,5 @@ export const MOCK_ADMIN_DATA = {
         { month: 'Jan', score: 730 },
     ]
 };
+
+    

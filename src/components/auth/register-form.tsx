@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles, UploadCloud, FileJson, IndianRupee } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -35,7 +35,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { aiCreditScore, type AiCreditScoreOutput } from '@/ai/ai-credit-scoring';
+import { billParser, type BillParserOutput } from '@/ai/flows/bill-parser';
+import Image from 'next/image';
 
 
 const formSchema = z.object({
@@ -57,6 +67,13 @@ export function RegisterForm() {
   const router = useRouter();
   const { toast } = useToast();
 
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isParsing, setIsParsing] = useState(false);
+  const [parsedData, setParsedData] = useState<BillParserOutput | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -73,6 +90,8 @@ export function RegisterForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+    // In a real app, you would also pass the parsed bill data to the backend
+    // for a more accurate credit score.
     try {
       const result = await aiCreditScore({
         personalInfo: {
@@ -107,6 +126,76 @@ export function RegisterForm() {
     });
     router.push('/login');
   }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      if (selectedFile.size > 4 * 1024 * 1024) {
+        toast({
+          variant: 'destructive',
+          title: 'File too large',
+          description: 'Please upload an image smaller than 4MB.',
+        });
+        return;
+      }
+      setFile(selectedFile);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
+      setParsedData(null);
+      setError(null);
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+  
+  const fileToDataUri = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  const handleParse = async () => {
+    if (!file) {
+      toast({
+        variant: 'destructive',
+        title: 'No file selected',
+        description: 'Please select a bill image to upload.',
+      });
+      return;
+    }
+
+    setIsParsing(true);
+    setError(null);
+    setParsedData(null);
+    
+    try {
+      const photoDataUri = await fileToDataUri(file);
+      const result = await billParser({ photoDataUri });
+      setParsedData(result);
+      toast({
+        title: 'Bill Parsed Successfully',
+        description: 'The AI has extracted the information from your bill.',
+      });
+    } catch (e: any) {
+      console.error(e);
+      setError('Failed to parse the bill. The AI could not read the document. Please try a clearer image.');
+      toast({
+        variant: 'destructive',
+        title: 'Parsing Failed',
+        description: 'The AI could not read the document. Please try again.',
+      });
+    } finally {
+      setIsParsing(false);
+    }
+  };
 
   return (
     <>
@@ -241,6 +330,61 @@ export function RegisterForm() {
             )}
           />
 
+        <Card>
+            <CardHeader>
+                <CardTitle>Upload Bills (Optional)</CardTitle>
+                <CardDescription>
+                    Upload utility bills to help us build a more accurate financial profile for you.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <Input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                    accept="image/png, image/jpeg, image/webp"
+                    />
+                
+                {!previewUrl ? (
+                    <div
+                    onClick={handleUploadClick}
+                    className="flex flex-col items-center justify-center space-y-2 border-2 border-dashed border-muted-foreground/50 rounded-lg p-12 text-center cursor-pointer hover:border-primary transition-colors"
+                    >
+                    <UploadCloud className="h-12 w-12 text-muted-foreground" />
+                    <p className="font-semibold">Click to upload a bill</p>
+                    <p className="text-sm text-muted-foreground">PNG, JPG, or WEBP (max. 4MB)</p>
+                    </div>
+                ) : (
+                    <div className="relative w-full max-w-sm mx-auto">
+                    <Image src={previewUrl} alt="Bill preview" width={400} height={600} className="rounded-lg object-contain" />
+                    </div>
+                )}
+
+                {file && !parsedData && (
+                     <Button onClick={handleParse} disabled={isParsing} className="w-full">
+                        {isParsing ? (
+                            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Parsing Bill...</>
+                        ) : "Parse Bill with AI"}
+                    </Button>
+                )}
+
+                {error && (
+                    <Alert variant="destructive">
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                )}
+
+                {parsedData && (
+                     <div>
+                        <p className="text-sm font-semibold text-center text-green-600">✓ Bill information captured.</p>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+
+
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -268,10 +412,12 @@ export function RegisterForm() {
             </div>
           )}
           <AlertDialogFooter>
-            <AlertDialogAction onClick={handleDialogClose}>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={handleDialogClose}>Continue to Login</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>
   );
 }
+
+    

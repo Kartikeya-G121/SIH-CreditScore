@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
@@ -49,7 +48,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
       <div className="grid gap-2">
-        <Label htmlFor="email">Email (Select a mock user)</Label>
+        <Label htmlFor="email">Select a Profile to Login</Label>
         <Select onValueChange={setEmail} value={email}>
           <SelectTrigger>
             <SelectValue placeholder="Select a user to log in" />
@@ -73,3 +72,5 @@ export function LoginForm() {
     </form>
   );
 }
+
+    
