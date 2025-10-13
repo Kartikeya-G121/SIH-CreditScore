@@ -50,17 +50,29 @@ import Image from 'next/image';
 type BillCategory = BillParserOutput['category'];
 
 
-const formSchema = z.object({
-  name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-  email: z.string().email({ message: 'Please enter a valid email.' }),
-  role: z.enum(['beneficiary', 'officer'], { required_error: 'Please select a role.' }),
-  age: z.coerce.number().min(18, { message: 'You must be at least 18.'}).max(100),
-  location: z.string().min(2, { message: 'Location is required.' }),
-  occupation: z.string().min(2, { message: 'Occupation is required.' }),
-  income: z.coerce.number().min(0, { message: 'Income cannot be negative.' }),
-  creditHistory: z.string().min(10, { message: 'Please describe your credit history.'}),
-  loanAmount: z.coerce.number().min(1000, { message: 'Loan amount must be at least 1000.' }),
-});
+const formSchema = z.discriminatedUnion('role', [
+  z.object({
+    role: z.literal('beneficiary'),
+    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    email: z.string().email({ message: 'Please enter a valid email.' }),
+    age: z.coerce.number().min(18, { message: 'You must be at least 18.'}).max(100),
+    location: z.string().min(2, { message: 'Location is required.' }),
+    occupation: z.string().min(2, { message: 'Occupation is required.' }),
+    income: z.coerce.number().min(0, { message: 'Income cannot be negative.' }),
+    creditHistory: z.string().min(10, { message: 'Please describe your credit history.'}),
+    loanAmount: z.coerce.number().min(1000, { message: 'Loan amount must be at least 1000.' }),
+  }),
+  z.object({
+    role: z.literal('officer'),
+    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    email: z.string().email({ message: 'Please enter a valid email.' }),
+  }),
+  z.object({
+    role: z.undefined(),
+    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    email: z.string().email({ message: 'Please enter a valid email.' }),
+  })
+]);
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -82,6 +94,7 @@ export function RegisterForm() {
     defaultValues: {
       name: '',
       email: '',
+      // @ts-ignore
       age: 25,
       location: 'Mumbai',
       occupation: 'Small Business Owner',
@@ -90,6 +103,8 @@ export function RegisterForm() {
       loanAmount: 100000,
     },
   });
+  
+  const role = form.watch('role');
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -97,7 +112,9 @@ export function RegisterForm() {
     // to a database. For this prototype, we'll just simulate it.
     
     console.log("Registering user:", values);
-    console.log("With bills:", bills);
+    if (values.role === 'beneficiary') {
+      console.log("With bills:", bills);
+    }
 
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -268,186 +285,196 @@ export function RegisterForm() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="age"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Age</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-           <FormField
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Location (City)</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., Delhi" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="occupation"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Occupation</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., Farmer, Artisan" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="income"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Monthly Income (INR)</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-           <FormField
-            control={form.control}
-            name="creditHistory"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Credit History</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., Paid all loans on time" {...field} />
-                </FormControl>
-                 <FormDescription>
-                   Briefly describe your past loans or credit card usage.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-           <FormField
-            control={form.control}
-            name="loanAmount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Desired Loan Amount (INR)</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
-        <Card>
-            <CardHeader>
-                <CardTitle>Upload Utility Bills (Optional)</CardTitle>
-                <CardDescription>
-                    Upload bills like electricity, mobile, or others to help us build a more accurate financial profile for you. You can add multiple bills.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 {bills.length > 0 && (
-                     <div className="space-y-2">
-                        <h4 className="font-medium text-sm">Added Bills:</h4>
-                        <div className="flex flex-wrap gap-2">
-                         {bills.map((bill, index) => (
-                             <div key={index} className="flex items-center gap-2 bg-muted p-2 rounded-md text-sm">
-                                <FileJson className="h-4 w-4" />
-                                <span>{bill.category}: {bill.vendorName} - <IndianRupee className="inline h-3 w-3"/>{bill.totalAmount}</span>
-                             </div>
-                         ))}
-                        </div>
-                     </div>
-                 )}
-                 <div className="space-y-2">
-                    <Label htmlFor="bill-category">Bill Category</Label>
-                    <Select onValueChange={(value) => setBillCategory(value as BillCategory)} value={billCategory} disabled={!!parsedData}>
-                        <SelectTrigger id="bill-category">
-                            <SelectValue placeholder="Select bill type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Electricity">Electricity</SelectItem>
-                            <SelectItem value="Mobile">Mobile</SelectItem>
-                            <SelectItem value="Utilities">Utilities</SelectItem>
-                            <SelectItem value="Healthcare">Healthcare</SelectItem>
-                            <SelectItem value="Education">Education</SelectItem>
-                            <SelectItem value="Other">Other</SelectItem>
-                        </SelectContent>
-                    </Select>
-                 </div>
-
-
-                 <Input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept="image/png, image/jpeg, image/webp"
-                    />
-                
-                {!previewUrl ? (
-                    <div
-                    onClick={handleUploadClick}
-                    className="flex flex-col items-center justify-center space-y-2 border-2 border-dashed border-muted-foreground/50 rounded-lg p-12 text-center cursor-pointer hover:border-primary transition-colors"
-                    >
-                    <UploadCloud className="h-12 w-12 text-muted-foreground" />
-                    <p className="font-semibold">Click to upload a bill</p>
-                    <p className="text-sm text-muted-foreground">PNG, JPG, or WEBP (max. 4MB)</p>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        <div className="relative w-full max-w-sm mx-auto">
-                            <Image src={previewUrl} alt="Bill preview" width={400} height={600} className="rounded-lg object-contain" />
-                        </div>
-                        
-                        {currentFile && !parsedData && (
-                            <Button onClick={handleParse} disabled={isParsing || !billCategory} className="w-full">
-                                {isParsing ? (
-                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Parsing Bill...</>
-                                ) : "Parse Bill with AI"}
-                            </Button>
-                        )}
-                    </div>
+          {role === 'beneficiary' && (
+            <>
+              <FormField
+                control={form.control}
+                name="age"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Age</FormLabel>
+                    <FormControl>
+                      {/* @ts-ignore */}
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-
-
-                {error && (
-                    <Alert variant="destructive">
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                    </Alert>
+              />
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Location (City)</FormLabel>
+                    <FormControl>
+                      {/* @ts-ignore */}
+                      <Input placeholder="e.g., Delhi" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
+              />
+              <FormField
+                control={form.control}
+                name="occupation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Occupation</FormLabel>
+                    <FormControl>
+                      {/* @ts-ignore */}
+                      <Input placeholder="e.g., Farmer, Artisan" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="income"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Monthly Income (INR)</FormLabel>
+                    <FormControl>
+                      {/* @ts-ignore */}
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="creditHistory"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Credit History</FormLabel>
+                    <FormControl>
+                      {/* @ts-ignore */}
+                      <Input placeholder="e.g., Paid all loans on time" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Briefly describe your past loans or credit card usage.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="loanAmount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Desired Loan Amount (INR)</FormLabel>
+                    <FormControl>
+                       {/* @ts-ignore */}
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                {parsedData && (
-                    <div className="border rounded-lg p-4 space-y-4">
-                        <h3 className="font-semibold">Verify Extracted Data</h3>
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                            <p><strong>Vendor:</strong> {parsedData.vendorName}</p>
-                            <p><strong>Date:</strong> {parsedData.transactionDate}</p>
-                            <p><strong>Total:</strong> <IndianRupee className="inline h-3 w-3"/>{parsedData.totalAmount}</p>
-                            <p><strong>Category:</strong> {billCategory} <span className="text-muted-foreground text-xs">(AI detected: {parsedData.category})</span></p>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Upload Utility Bills (Optional)</CardTitle>
+                    <CardDescription>
+                        Upload bills like electricity, mobile, or others to help us build a more accurate financial profile for you. You can add multiple bills.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {bills.length > 0 && (
+                        <div className="space-y-2">
+                            <h4 className="font-medium text-sm">Added Bills:</h4>
+                            <div className="flex flex-wrap gap-2">
+                            {bills.map((bill, index) => (
+                                <div key={index} className="flex items-center gap-2 bg-muted p-2 rounded-md text-sm">
+                                    <FileJson className="h-4 w-4" />
+                                    <span>{bill.category}: {bill.vendorName} - <IndianRupee className="inline h-3 w-3"/>{bill.totalAmount}</span>
+                                </div>
+                            ))}
+                            </div>
                         </div>
-                         <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={handleResetUpload}>Cancel</Button>
-                            <Button onClick={handleConfirmBill}>Confirm & Add Bill</Button>
-                        </div>
+                    )}
+                    <div className="space-y-2">
+                        <Label htmlFor="bill-category">Bill Category</Label>
+                        <Select onValueChange={(value) => setBillCategory(value as BillCategory)} value={billCategory} disabled={!!parsedData}>
+                            <SelectTrigger id="bill-category">
+                                <SelectValue placeholder="Select bill type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Electricity">Electricity</SelectItem>
+                                <SelectItem value="Mobile">Mobile</SelectItem>
+                                <SelectItem value="Utilities">Utilities</SelectItem>
+                                <SelectItem value="Healthcare">Healthcare</SelectItem>
+                                <SelectItem value="Education">Education</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
-                )}
-            </CardContent>
-        </Card>
 
+
+                    <Input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        className="hidden"
+                        accept="image/png, image/jpeg, image/webp"
+                        />
+                    
+                    {!previewUrl ? (
+                        <div
+                        onClick={handleUploadClick}
+                        className="flex flex-col items-center justify-center space-y-2 border-2 border-dashed border-muted-foreground/50 rounded-lg p-12 text-center cursor-pointer hover:border-primary transition-colors"
+                        >
+                        <UploadCloud className="h-12 w-12 text-muted-foreground" />
+                        <p className="font-semibold">Click to upload a bill</p>
+                        <p className="text-sm text-muted-foreground">PNG, JPG, or WEBP (max. 4MB)</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="relative w-full max-w-sm mx-auto">
+                                <Image src={previewUrl} alt="Bill preview" width={400} height={600} className="rounded-lg object-contain" />
+                            </div>
+                            
+                            {currentFile && !parsedData && (
+                                <Button onClick={handleParse} disabled={isParsing || !billCategory} className="w-full">
+                                    {isParsing ? (
+                                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Parsing Bill...</>
+                                    ) : "Parse Bill with AI"}
+                                </Button>
+                            )}
+                        </div>
+                    )}
+
+
+                    {error && (
+                        <Alert variant="destructive">
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
+                        </Alert>
+                    )}
+
+                    {parsedData && (
+                        <div className="border rounded-lg p-4 space-y-4">
+                            <h3 className="font-semibold">Verify Extracted Data</h3>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                                <p><strong>Vendor:</strong> {parsedData.vendorName}</p>
+                                <p><strong>Date:</strong> {parsedData.transactionDate}</p>
+                                <p><strong>Total:</strong> <IndianRupee className="inline h-3 w-3"/>{parsedData.totalAmount}</p>
+                                <p><strong>Category:</strong> {billCategory} <span className="text-muted-foreground text-xs">(AI detected: {parsedData.category})</span></p>
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <Button variant="outline" onClick={handleResetUpload}>Cancel</Button>
+                                <Button onClick={handleConfirmBill}>Confirm & Add Bill</Button>
+                            </div>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+            </>
+          )}
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
