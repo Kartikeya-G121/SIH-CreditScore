@@ -303,19 +303,6 @@ export default function BeneficiaryDashboard({ activeTab = 'overview' }: { activ
             )}
           </CardContent>
         </Card>
-
-         <Card>
-          <CardHeader>
-            <CardTitle>Language Preference</CardTitle>
-            <CardDescription>Select your preferred language for the portal.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            <Button variant="outline"><Languages className="mr-2 h-4 w-4" /> English</Button>
-            <Button variant="ghost">हिंदी</Button>
-            <Button variant="ghost">বাংলা</Button>
-            <Button variant="ghost">தமிழ்</Button>
-          </CardContent>
-        </Card>
       </TabsContent>
 
        <TabsContent value="advice" className="space-y-6 mt-0">

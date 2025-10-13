@@ -26,12 +26,20 @@ import {
   HelpCircle,
   Lightbulb,
   UploadCloud,
+  Languages,
 } from 'lucide-react';
 import { UserNav } from '@/components/layout/user-nav';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FloatingChatbotButton } from '@/components/chatbot/floating-chatbot-button';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 function DashboardSidebar() {
   const { user } = useAuth();
@@ -159,6 +167,42 @@ function DashboardSidebar() {
   );
 }
 
+function LanguageSwitcher() {
+    const { toast } = useToast();
+
+    const handleLanguageChange = (lang: string) => {
+        toast({
+            title: 'Language Switched',
+            description: `Language has been set to ${lang}.`,
+        });
+    };
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                    <Languages className="h-5 w-5" />
+                    <span className="sr-only">Change language</span>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => handleLanguageChange('English')}>
+                    English
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => handleLanguageChange('Hindi')}>
+                    हिंदी
+                </DropdownMenuItem>
+                 <DropdownMenuItem onSelect={() => handleLanguageChange('Bengali')}>
+                    বাংলা
+                </DropdownMenuItem>
+                 <DropdownMenuItem onSelect={() => handleLanguageChange('Tamil')}>
+                    தமிழ்
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
+
 function DashboardHeader() {
   const { user } = useAuth();
   const roleHeadings = {
@@ -169,7 +213,10 @@ function DashboardHeader() {
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
       <h1 className="text-xl font-semibold">{user ? roleHeadings[user.role] : 'Dashboard'}</h1>
-      <UserNav />
+      <div className="flex items-center gap-2">
+        <LanguageSwitcher />
+        <UserNav />
+      </div>
     </header>
   );
 }
