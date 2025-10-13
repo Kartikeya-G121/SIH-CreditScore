@@ -47,6 +47,8 @@ import { aiCreditScore, type AiCreditScoreOutput } from '@/ai/ai-credit-scoring'
 import { billParser, type BillParserOutput } from '@/ai/flows/bill-parser';
 import Image from 'next/image';
 
+type BillCategory = BillParserOutput['category'];
+
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -72,6 +74,8 @@ export function RegisterForm() {
   const [parsedData, setParsedData] = useState<BillParserOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [billCategory, setBillCategory] = useState<BillCategory | ''>('');
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -152,6 +156,15 @@ export function RegisterForm() {
       });
       return;
     }
+     if (!billCategory) {
+      toast({
+        variant: 'destructive',
+        title: 'No category selected',
+        description: 'Please select a bill category.',
+      });
+      return;
+    }
+
 
     setIsParsing(true);
     setError(null);
@@ -179,8 +192,12 @@ export function RegisterForm() {
   };
 
   const handleConfirmBill = () => {
-      if (!parsedData) return;
-      setBills(prev => [...prev, parsedData]);
+      if (!parsedData || !billCategory) return;
+      const finalBillData = {
+          ...parsedData,
+          category: billCategory
+      };
+      setBills(prev => [...prev, finalBillData]);
       handleResetUpload();
       toast({
           title: 'Bill Added',
@@ -193,6 +210,7 @@ export function RegisterForm() {
       setPreviewUrl(null);
       setParsedData(null);
       setError(null);
+      setBillCategory('');
       if (fileInputRef.current) {
           fileInputRef.current.value = "";
       }
@@ -347,12 +365,29 @@ export function RegisterForm() {
                          {bills.map((bill, index) => (
                              <div key={index} className="flex items-center gap-2 bg-muted p-2 rounded-md text-sm">
                                 <FileJson className="h-4 w-4" />
-                                <span>{bill.vendorName} - <IndianRupee className="inline h-3 w-3"/>{bill.totalAmount}</span>
+                                <span>{bill.category}: {bill.vendorName} - <IndianRupee className="inline h-3 w-3"/>{bill.totalAmount}</span>
                              </div>
                          ))}
                         </div>
                      </div>
                  )}
+                 <div className="space-y-2">
+                    <Label htmlFor="bill-category">Bill Category</Label>
+                    <Select onValueChange={(value) => setBillCategory(value as BillCategory)} value={billCategory} disabled={!!parsedData}>
+                        <SelectTrigger id="bill-category">
+                            <SelectValue placeholder="Select bill type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Electricity">Electricity</SelectItem>
+                            <SelectItem value="Mobile">Mobile</SelectItem>
+                            <SelectItem value="Utilities">Utilities</SelectItem>
+                            <SelectItem value="Healthcare">Healthcare</SelectItem>
+                            <SelectItem value="Education">Education</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                    </Select>
+                 </div>
+
 
                  <Input
                     type="file"
@@ -378,7 +413,7 @@ export function RegisterForm() {
                         </div>
                         
                         {currentFile && !parsedData && (
-                            <Button onClick={handleParse} disabled={isParsing} className="w-full">
+                            <Button onClick={handleParse} disabled={isParsing || !billCategory} className="w-full">
                                 {isParsing ? (
                                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Parsing Bill...</>
                                 ) : "Parse Bill with AI"}
@@ -402,7 +437,7 @@ export function RegisterForm() {
                             <p><strong>Vendor:</strong> {parsedData.vendorName}</p>
                             <p><strong>Date:</strong> {parsedData.transactionDate}</p>
                             <p><strong>Total:</strong> <IndianRupee className="inline h-3 w-3"/>{parsedData.totalAmount}</p>
-                            <p><strong>Category:</strong> {parsedData.category}</p>
+                            <p><strong>Category:</strong> {billCategory} <span className="text-muted-foreground text-xs">(AI detected: {parsedData.category})</span></p>
                         </div>
                          <div className="flex justify-end gap-2">
                             <Button variant="outline" onClick={handleResetUpload}>Cancel</Button>
