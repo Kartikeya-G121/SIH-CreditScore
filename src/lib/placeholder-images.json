@@ -1,12 +1,6 @@
 {
   "placeholderImages": [
     {
-        "id": "hero",
-        "description": "An illustration of an empowered Indian woman with symbols of finance, credit scoring, and AI.",
-        "imageUrl": "https://firebasestudio.googleapis.com/v0/b/firebase-studio-users.appspot.com/o/user-assets%2Funknown-user%2Fclvg2jks000003b6d2k75806x%2Fclw7i3v9l000108l89u33dhtc.png?alt=media&token=2620a27c-619e-4e6e-ab45-131751d3b04c",
-        "imageHint": "financial empowerment"
-    },      
-    {
       "id": "partner-nbcfdc",
       "description": "NBCFDC Logo",
       "imageUrl": "https://picsum.photos/seed/nbcfdc-logo/200/100",
