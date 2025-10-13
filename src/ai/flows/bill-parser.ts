@@ -23,7 +23,7 @@ const BillParserOutputSchema = z.object({
   vendorName: z.string().describe('The name of the vendor or store.'),
   transactionDate: z.string().describe('The date of the transaction in YYYY-MM-DD format.'),
   totalAmount: z.number().describe('The total amount of the bill.'),
-  category: z.enum(['Essential', 'Discretionary', 'Utilities', 'Healthcare', 'Education', 'Other']).describe('The primary category of the expenditure.'),
+  category: z.enum(['Electricity', 'Mobile', 'Utilities', 'Healthcare', 'Education', 'Essential', 'Discretionary', 'Other']).describe('The primary category of the expenditure.'),
   lineItems: z.array(z.object({
     description: z.string().describe('The description of the line item.'),
     amount: z.number().describe('The amount for the line item.'),
@@ -45,7 +45,7 @@ const prompt = ai.definePrompt({
   - Transaction date
   - Total amount
   - A list of all line items with their descriptions and amounts.
-  - A primary category for the overall purchase (Essential, Discretionary, Utilities, Healthcare, Education, Other).
+  - A primary category for the overall purchase (Electricity, Mobile, Utilities, Healthcare, Education, Essential, Discretionary, Other).
   
   Make sure to adhere to the requested JSON schema and field descriptions.
 

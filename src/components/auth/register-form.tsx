@@ -62,12 +62,11 @@ const formSchema = z.object({
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [showScore, setShowScore] = useState(false);
-  const [scoreResult, setScoreResult] = useState<AiCreditScoreOutput | null>(null);
   const router = useRouter();
   const { toast } = useToast();
 
-  const [file, setFile] = useState<File | null>(null);
+  const [bills, setBills] = useState<BillParserOutput[]>([]);
+  const [currentFile, setCurrentFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [parsedData, setParsedData] = useState<BillParserOutput | null>(null);
@@ -90,41 +89,23 @@ export function RegisterForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    // In a real app, you would also pass the parsed bill data to the backend
-    // for a more accurate credit score.
-    try {
-      const result = await aiCreditScore({
-        personalInfo: {
-            age: values.age,
-            location: values.location,
-            occupation: values.occupation,
-        },
-        financialInfo: {
-            income: values.income,
-            creditHistory: values.creditHistory,
-            loanAmount: values.loanAmount,
-        }
-      });
-      setScoreResult(result);
-      setShowScore(true);
-    } catch (error) {
-       toast({
-        title: 'Error Calculating Score',
-        description: 'There was an issue with the AI credit scoring. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-        setIsLoading(false);
-    }
-  }
+    // In a real app, this is where you would save the user and their bills
+    // to a database. For this prototype, we'll just simulate it.
+    
+    console.log("Registering user:", values);
+    console.log("With bills:", bills);
 
-  const handleDialogClose = () => {
-    setShowScore(false);
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
     toast({
       title: 'Registration Successful',
-      description: "You can now log in. We're redirecting you...",
+      description: "You're all set! Redirecting you to the login page.",
     });
+
     router.push('/login');
+
+    setIsLoading(false);
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,7 +119,7 @@ export function RegisterForm() {
         });
         return;
       }
-      setFile(selectedFile);
+      setCurrentFile(selectedFile);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
@@ -163,7 +144,7 @@ export function RegisterForm() {
   }
 
   const handleParse = async () => {
-    if (!file) {
+    if (!currentFile) {
       toast({
         variant: 'destructive',
         title: 'No file selected',
@@ -177,12 +158,12 @@ export function RegisterForm() {
     setParsedData(null);
     
     try {
-      const photoDataUri = await fileToDataUri(file);
+      const photoDataUri = await fileToDataUri(currentFile);
       const result = await billParser({ photoDataUri });
       setParsedData(result);
       toast({
         title: 'Bill Parsed Successfully',
-        description: 'The AI has extracted the information from your bill.',
+        description: 'Please review the extracted information below.',
       });
     } catch (e: any) {
       console.error(e);
@@ -196,6 +177,27 @@ export function RegisterForm() {
       setIsParsing(false);
     }
   };
+
+  const handleConfirmBill = () => {
+      if (!parsedData) return;
+      setBills(prev => [...prev, parsedData]);
+      handleResetUpload();
+      toast({
+          title: 'Bill Added',
+          description: 'The bill has been added to your registration details.'
+      });
+  }
+  
+  const handleResetUpload = () => {
+      setCurrentFile(null);
+      setPreviewUrl(null);
+      setParsedData(null);
+      setError(null);
+      if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+      }
+  }
+
 
   return (
     <>
@@ -332,12 +334,26 @@ export function RegisterForm() {
 
         <Card>
             <CardHeader>
-                <CardTitle>Upload Bills (Optional)</CardTitle>
+                <CardTitle>Upload Utility Bills (Optional)</CardTitle>
                 <CardDescription>
-                    Upload utility bills to help us build a more accurate financial profile for you.
+                    Upload bills like electricity, mobile, or others to help us build a more accurate financial profile for you. You can add multiple bills.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+                 {bills.length > 0 && (
+                     <div className="space-y-2">
+                        <h4 className="font-medium text-sm">Added Bills:</h4>
+                        <div className="flex flex-wrap gap-2">
+                         {bills.map((bill, index) => (
+                             <div key={index} className="flex items-center gap-2 bg-muted p-2 rounded-md text-sm">
+                                <FileJson className="h-4 w-4" />
+                                <span>{bill.vendorName} - <IndianRupee className="inline h-3 w-3"/>{bill.totalAmount}</span>
+                             </div>
+                         ))}
+                        </div>
+                     </div>
+                 )}
+
                  <Input
                     type="file"
                     ref={fileInputRef}
@@ -356,18 +372,21 @@ export function RegisterForm() {
                     <p className="text-sm text-muted-foreground">PNG, JPG, or WEBP (max. 4MB)</p>
                     </div>
                 ) : (
-                    <div className="relative w-full max-w-sm mx-auto">
-                    <Image src={previewUrl} alt="Bill preview" width={400} height={600} className="rounded-lg object-contain" />
+                    <div className="space-y-4">
+                        <div className="relative w-full max-w-sm mx-auto">
+                            <Image src={previewUrl} alt="Bill preview" width={400} height={600} className="rounded-lg object-contain" />
+                        </div>
+                        
+                        {currentFile && !parsedData && (
+                            <Button onClick={handleParse} disabled={isParsing} className="w-full">
+                                {isParsing ? (
+                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Parsing Bill...</>
+                                ) : "Parse Bill with AI"}
+                            </Button>
+                        )}
                     </div>
                 )}
 
-                {file && !parsedData && (
-                     <Button onClick={handleParse} disabled={isParsing} className="w-full">
-                        {isParsing ? (
-                            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Parsing Bill...</>
-                        ) : "Parse Bill with AI"}
-                    </Button>
-                )}
 
                 {error && (
                     <Alert variant="destructive">
@@ -377,8 +396,18 @@ export function RegisterForm() {
                 )}
 
                 {parsedData && (
-                     <div>
-                        <p className="text-sm font-semibold text-center text-green-600">✓ Bill information captured.</p>
+                    <div className="border rounded-lg p-4 space-y-4">
+                        <h3 className="font-semibold">Verify Extracted Data</h3>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                            <p><strong>Vendor:</strong> {parsedData.vendorName}</p>
+                            <p><strong>Date:</strong> {parsedData.transactionDate}</p>
+                            <p><strong>Total:</strong> <IndianRupee className="inline h-3 w-3"/>{parsedData.totalAmount}</p>
+                            <p><strong>Category:</strong> {parsedData.category}</p>
+                        </div>
+                         <div className="flex justify-end gap-2">
+                            <Button variant="outline" onClick={handleResetUpload}>Cancel</Button>
+                            <Button onClick={handleConfirmBill}>Confirm & Add Bill</Button>
+                        </div>
                     </div>
                 )}
             </CardContent>
@@ -391,33 +420,10 @@ export function RegisterForm() {
             ) : (
              <Sparkles className="mr-2 h-4 w-4" />
             )}
-            Create Account & Calculate Score
+            Create Account
           </Button>
         </form>
       </Form>
-      
-      <AlertDialog open={showScore} onOpenChange={setShowScore}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Your AI Composite Credit Score</AlertDialogTitle>
-            <AlertDialogDescription>
-              Based on the information you provided, here is your initial credit assessment.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          {scoreResult && (
-            <div className="my-4 text-center">
-                <div className="text-6xl font-bold text-primary">{scoreResult.creditScore}</div>
-                <div className="text-lg font-semibold mt-2">{scoreResult.riskLevel} Risk</div>
-                <p className="text-sm text-muted-foreground mt-4">{scoreResult.insights}</p>
-            </div>
-          )}
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={handleDialogClose}>Continue to Login</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }
-
-    
