@@ -27,15 +27,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
   Card,
   CardContent,
   CardDescription,
@@ -43,10 +34,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { aiCreditScore, type AiCreditScoreOutput } from '@/ai/ai-credit-scoring';
 import { billParser, type BillParserOutput } from '@/ai/flows/bill-parser';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/language-context';
+import { Textarea } from '../ui/textarea';
 
 type BillCategory = BillParserOutput['category'];
 
@@ -57,7 +48,9 @@ const formSchema = z.discriminatedUnion('role', [
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
     email: z.string().email({ message: 'Please enter a valid email.' }),
     age: z.coerce.number().min(18, { message: 'You must be at least 18.'}).max(100),
-    location: z.string().min(2, { message: 'Location is required.' }),
+    address: z.string().min(10, { message: 'Please enter a full address.' }),
+    location: z.string().min(2, { message: 'City/Town/Village is required.' }),
+    pincode: z.string().regex(/^\d{6}$/, { message: 'Please enter a valid 6-digit Indian pincode.' }),
     occupation: z.string().min(2, { message: 'Occupation is required.' }),
     income: z.coerce.number().min(0, { message: 'Income cannot be negative.' }),
     creditHistory: z.string().min(10, { message: 'Please describe your credit history.'}),
@@ -98,7 +91,9 @@ export function RegisterForm() {
       email: '',
       // @ts-ignore
       age: 25,
+      address: '',
       location: 'Mumbai',
+      pincode: '',
       occupation: 'Small Business Owner',
       income: 50000,
       creditHistory: 'No defaults, have a credit card with 2 years of history.',
@@ -239,144 +234,197 @@ export function RegisterForm() {
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('name_label')}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t('name_placeholder')} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-           <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('email_label')}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t('email_placeholder')} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('role_label')}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('role_placeholder')} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="beneficiary">{t('beneficiary')}</SelectItem>
-                    <SelectItem value="officer">{t('officer')}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('general_info')}</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('name_label')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t('name_placeholder')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('email_label')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t('email_placeholder')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('role_label')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('role_placeholder')} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="beneficiary">{t('beneficiary')}</SelectItem>
+                        <SelectItem value="officer">{t('officer')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+          
           {role === 'beneficiary' && (
             <>
-              <FormField
-                control={form.control}
-                name="age"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('age_label')}</FormLabel>
-                    <FormControl>
-                      {/* @ts-ignore */}
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('location_label')}</FormLabel>
-                    <FormControl>
-                      {/* @ts-ignore */}
-                      <Input placeholder={t('location_placeholder')} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="occupation"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('occupation_label')}</FormLabel>
-                    <FormControl>
-                      {/* @ts-ignore */}
-                      <Input placeholder={t('occupation_placeholder')} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="income"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('income_label')}</FormLabel>
-                    <FormControl>
-                      {/* @ts-ignore */}
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="creditHistory"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('credit_history_label')}</FormLabel>
-                    <FormControl>
-                      {/* @ts-ignore */}
-                      <Input placeholder={t('credit_history_placeholder')} {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      {t('credit_history_desc')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="loanAmount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('loan_amount_label')}</FormLabel>
-                    <FormControl>
-                       {/* @ts-ignore */}
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <Card>
+                <CardHeader>
+                    <CardTitle>{t('address_info')}</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                    <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>{t('address_label')}</FormLabel>
+                            <FormControl>
+                                {/* @ts-ignore */}
+                                <Textarea placeholder={t('address_placeholder')} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="location"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>{t('location_label')}</FormLabel>
+                                <FormControl>
+                                {/* @ts-ignore */}
+                                <Input placeholder={t('location_placeholder')} {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="pincode"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>{t('pincode_label')}</FormLabel>
+                                <FormControl>
+                                {/* @ts-ignore */}
+                                <Input placeholder={t('pincode_placeholder')} {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                    </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                    <CardTitle>{t('financial_info')}</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                  <FormField
+                    control={form.control}
+                    name="age"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('age_label')}</FormLabel>
+                        <FormControl>
+                          {/* @ts-ignore */}
+                          <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="occupation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('occupation_label')}</FormLabel>
+                        <FormControl>
+                          {/* @ts-ignore */}
+                          <Input placeholder={t('occupation_placeholder')} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="income"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('income_label')}</FormLabel>
+                        <FormControl>
+                          {/* @ts-ignore */}
+                          <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="creditHistory"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('credit_history_label')}</FormLabel>
+                        <FormControl>
+                          {/* @ts-ignore */}
+                          <Textarea placeholder={t('credit_history_placeholder')} {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          {t('credit_history_desc')}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="loanAmount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('loan_amount_label')}</FormLabel>
+                        <FormControl>
+                          {/* @ts-ignore */}
+                          <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+
 
             <Card>
                 <CardHeader>
