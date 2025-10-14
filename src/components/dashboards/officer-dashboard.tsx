@@ -102,7 +102,7 @@ function RiskAnalysisDialog({ beneficiary, open, onOpenChange }: { beneficiary: 
                             <div className="text-2xl font-bold flex items-center gap-2 justify-center">
                                 <Badge
                                     variant={riskVariant[beneficiary.risk]}
-                                    className={riskColorClass[beneficiary.risk as keyof typeof riskColorClass]}
+                                    className={cn(riskColorClass[beneficiary.risk as keyof typeof riskColorClass], 'text-base')}
                                     >
                                     {beneficiary.risk}
                                 </Badge>
@@ -220,7 +220,7 @@ export default function OfficerDashboard() {
                 <TableRow>
                     <TableHead>{t('officer_table_beneficiary')}</TableHead>
                     <TableHead>{t('officer_table_region')}</TableHead>
-                    <TableHead>Income</TableHead>
+                    <TableHead>Income Level</TableHead>
                     <TableHead>{t('officer_table_ai_score')}</TableHead>
                     <TableHead>{t('officer_table_risk')}</TableHead>
                     <TableHead>{t('officer_table_loan_stage')}</TableHead>
@@ -237,15 +237,9 @@ export default function OfficerDashboard() {
                             </TableCell>
                             <TableCell>{beneficiary.region}</TableCell>
                             <TableCell>
-                                <div className='flex items-center gap-2'>
-                                    <div className='flex items-center'>
-                                      <IndianRupee className='h-4 w-4 mr-1 text-muted-foreground' />
-                                      {beneficiary.income.toLocaleString('en-IN')}
-                                    </div>
-                                    <Badge variant={isHighIncome ? 'secondary' : 'outline'} className={cn(isHighIncome ? "text-green-700 border-green-700/50" : "text-amber-700 border-amber-700/50")}>
-                                      {isHighIncome ? "High" : "Low"}
-                                    </Badge>
-                                </div>
+                                <Badge variant={isHighIncome ? 'secondary' : 'outline'} className={cn(isHighIncome ? "text-green-700 border-green-700/50" : "text-amber-700 border-amber-700/50")}>
+                                    {isHighIncome ? "High" : "Low"}
+                                </Badge>
                             </TableCell>
                             <TableCell>{beneficiary.score}</TableCell>
                             <TableCell>
@@ -296,9 +290,9 @@ export default function OfficerDashboard() {
                 })}
                 </TableBody>
             </Table>
-            <RiskAnalysisDialog beneficiary={selectedBeneficiary} open={isDialogOpen} onOpenChange={setIsDialogOpen} />
         </CardContent>
       </Card>
+      <RiskAnalysisDialog beneficiary={selectedBeneficiary} open={isDialogOpen} onOpenChange={setIsDialogOpen} />
       
       <Card>
         <CardHeader>
