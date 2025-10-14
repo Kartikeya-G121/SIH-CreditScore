@@ -233,7 +233,7 @@ export default function OfficerDashboard() {
                         </TableCell>
                         <TableCell>{beneficiary.loanStage}</TableCell>
                         <TableCell className="text-right">
-                            <DialogTrigger asChild>
+                            
                                 <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -264,7 +264,7 @@ export default function OfficerDashboard() {
                                     <DropdownMenuItem>Request Verification</DropdownMenuItem>
                                 </DropdownMenuContent>
                                 </DropdownMenu>
-                            </DialogTrigger>
+                           
                              <RiskAnalysisDialog beneficiary={beneficiary} />
                         </TableCell>
                         </TableRow>
