@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useMemo } from 'react';
 import {
@@ -47,16 +48,37 @@ import {
   ThumbsUp,
   Meh,
   IndianRupee,
+  Users,
+  Wallet,
+  Activity,
+  Download,
 } from 'lucide-react';
-import { MOCK_BENEFICIARIES_LIST } from '@/lib/data';
+import { MOCK_BENEFICIARIES_LIST, MOCK_ADMIN_DATA } from '@/lib/data';
 import { StatCard } from '../shared/stat-card';
-import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar } from 'recharts';
-import { ChartContainer, ChartTooltipContent } from '../ui/chart';
+import {
+  ResponsiveContainer,
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Bar,
+  AreaChart,
+  Area,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
+import {
+  ChartContainer,
+  ChartTooltipContent,
+  ChartTooltip as RechartsTooltip,
+} from '../ui/chart';
 import { useLanguage } from '@/contexts/language-context';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
-type Beneficiary = typeof MOCK_BENEFICIARIES_LIST[0];
+type Beneficiary = (typeof MOCK_BENEFICIARIES_LIST)[0];
 
 const riskVariant: { [key: string]: 'default' | 'destructive' | 'outline' } = {
   Low: 'default',
@@ -69,58 +91,71 @@ const riskColorClass = {
   High: 'bg-destructive text-destructive-foreground',
 };
 const riskIcon = {
-    Low: <ThumbsUp className="h-5 w-5 text-green-600" />,
-    Medium: <Meh className="h-5 w-5 text-yellow-500" />,
-    High: <AlertCircle className="h-5 w-5 text-destructive" />
-}
+  Low: <ThumbsUp className="h-5 w-5 text-green-600" />,
+  Medium: <Meh className="h-5 w-5 text-yellow-500" />,
+  High: <AlertCircle className="h-5 w-5 text-destructive" />,
+};
 
 const INCOME_THRESHOLD = 50000;
 
-function RiskAnalysisDialog({ beneficiary, open, onOpenChange }: { beneficiary: Beneficiary | null, open: boolean, onOpenChange: (open: boolean) => void }) {
-    if (!beneficiary) return null;
-    const risk = beneficiary.risk as keyof typeof riskIcon;
-    return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        {riskIcon[risk]}
-                        Risk Analysis for {beneficiary.name}
-                    </DialogTitle>
-                    <DialogDescription>
-                        AI-generated insights into the beneficiary's credit risk profile.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                    <div className="flex justify-around rounded-lg bg-muted p-4 text-center">
-                        <div>
-                            <p className="text-sm text-muted-foreground">AI Score</p>
-                            <p className="text-2xl font-bold">{beneficiary.score}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm text-muted-foreground">Risk Level</p>
-                            <div className="text-2xl font-bold flex items-center gap-2 justify-center">
-                                <Badge
-                                    variant={riskVariant[beneficiary.risk]}
-                                    className={cn(riskColorClass[beneficiary.risk as keyof typeof riskColorClass], 'text-base')}
-                                    >
-                                    {beneficiary.risk}
-                                </Badge>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold mb-2">Key Risk Factors:</h4>
-                        <ul className="space-y-2 list-disc list-inside">
-                            {beneficiary.riskFactors.map((factor, index) => (
-                                <li key={index} className="text-sm text-foreground">{factor}</li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-    )
+function RiskAnalysisDialog({
+  beneficiary,
+  open,
+  onOpenChange,
+}: {
+  beneficiary: Beneficiary | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  if (!beneficiary) return null;
+  const risk = beneficiary.risk as keyof typeof riskIcon;
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            {riskIcon[risk]}
+            Risk Analysis for {beneficiary.name}
+          </DialogTitle>
+          <DialogDescription>
+            AI-generated insights into the beneficiary's credit risk profile.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="flex justify-around rounded-lg bg-muted p-4 text-center">
+            <div>
+              <p className="text-sm text-muted-foreground">AI Score</p>
+              <p className="text-2xl font-bold">{beneficiary.score}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Risk Level</p>
+              <div className="text-2xl font-bold flex items-center gap-2 justify-center">
+                <Badge
+                  variant={riskVariant[beneficiary.risk]}
+                  className={cn(
+                    riskColorClass[beneficiary.risk as keyof typeof riskColorClass],
+                    'text-base'
+                  )}
+                >
+                  {beneficiary.risk}
+                </Badge>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-2">Key Risk Factors:</h4>
+            <ul className="space-y-2 list-disc list-inside">
+              {beneficiary.riskFactors.map((factor, index) => (
+                <li key={index} className="text-sm text-foreground">
+                  {factor}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 export default function OfficerDashboard() {
@@ -128,25 +163,28 @@ export default function OfficerDashboard() {
   const { toast } = useToast();
   const [beneficiaries, setBeneficiaries] = useState(MOCK_BENEFICIARIES_LIST);
   const [riskFilter, setRiskFilter] = useState('All');
-  const [selectedBeneficiary, setSelectedBeneficiary] = useState<Beneficiary | null>(null);
+  const [selectedBeneficiary, setSelectedBeneficiary] =
+    useState<Beneficiary | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { stats, riskDistribution, aiForecast } = MOCK_ADMIN_DATA;
 
-  const handleUpdateLoanStage = (beneficiaryId: string, stage: 'Approved' | 'Flagged') => {
-    setBeneficiaries(prev => 
-        prev.map(b => 
-            b.id === beneficiaryId ? { ...b, loanStage: stage } : b
-        )
+  const handleUpdateLoanStage = (
+    beneficiaryId: string,
+    stage: 'Approved' | 'Flagged'
+  ) => {
+    setBeneficiaries((prev) =>
+      prev.map((b) => (b.id === beneficiaryId ? { ...b, loanStage: stage } : b))
     );
     toast({
-        title: `Beneficiary ${stage}`,
-        description: `The loan application has been marked as ${stage}.`
+      title: `Beneficiary ${stage}`,
+      description: `The loan application has been marked as ${stage}.`,
     });
   };
 
   const handleViewRiskAnalysis = (beneficiary: Beneficiary) => {
     setSelectedBeneficiary(beneficiary);
     setIsDialogOpen(true);
-  }
+  };
 
   const geoData = [
     { name: 'Maharashtra', repayment: 98 },
@@ -161,11 +199,99 @@ export default function OfficerDashboard() {
     if (riskFilter === 'All') {
       return beneficiaries;
     }
-    return beneficiaries.filter(b => b.risk === riskFilter);
+    return beneficiaries.filter((b) => b.risk === riskFilter);
   }, [beneficiaries, riskFilter]);
 
   return (
     <div className="space-y-6">
+       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Total Beneficiaries"
+          value={stats.totalBeneficiaries}
+          icon={<Users className="h-4 w-4" />}
+          description="+20.1% from last month"
+          className="transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
+        />
+        <StatCard
+          title="Active Loans"
+          value={stats.activeLoans}
+          icon={<Wallet className="h-4 w-4" />}
+          description="+180.1% from last month"
+          className="transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
+        />
+        <StatCard
+          title="Average Score"
+          value={stats.averageScore}
+          icon={<TrendingUp className="h-4 w-4" />}
+          description="+12 since last month"
+          className="transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
+        />
+        <StatCard
+          title="Regional Default Rate"
+          value={`${stats.regionalDefaultRate}`}
+          icon={<Activity className="h-4 w-4" />}
+          description="-1.2% from last month"
+          className="transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg"
+        />
+      </div>
+
+       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-12 lg:col-span-4">
+          <CardHeader>
+            <CardTitle>AI Forecast Graph</CardTitle>
+          </CardHeader>
+          <CardContent className="pl-2">
+            <ChartContainer config={{}} className="h-[300px] w-full">
+              <AreaChart data={aiForecast}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <RechartsTooltip
+                  content={
+                    <ChartTooltipContent
+                      labelKey="score"
+                      indicator="dot"
+                      hideLabel
+                    />
+                  }
+                />
+                <Area
+                  type="monotone"
+                  dataKey="score"
+                  stroke="hsl(var(--primary))"
+                  fill="hsl(var(--primary))"
+                  fillOpacity={0.2}
+                />
+              </AreaChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+        <Card className="col-span-12 lg:col-span-3">
+          <CardHeader>
+            <CardTitle>Risk Distribution</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={{
+                value: { label: 'Beneficiaries' },
+              }}
+              className="h-[300px] w-full"
+            >
+              <PieChart>
+                <RechartsTooltip
+                  content={<ChartTooltipContent nameKey="name" hideLabel />}
+                />
+                <Pie data={riskDistribution} dataKey="value" nameKey="name">
+                  {riskDistribution.map((entry, index) => (
+                     <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-3">
         <StatCard
           title="Top Performing Region"
@@ -191,127 +317,196 @@ export default function OfficerDashboard() {
       </div>
 
       <Card>
-        <CardHeader className='flex-row items-center justify-between'>
+        <CardHeader className="flex-row items-center justify-between">
           <div>
             <CardTitle>{t('officer_beneficiaries_title')}</CardTitle>
-            <CardDescription>
-              {t('officer_beneficiaries_desc')}
-            </CardDescription>
+            <CardDescription>{t('officer_beneficiaries_desc')}</CardDescription>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline"><Filter className="mr-2 h-4 w-4"/> {t('officer_filter')}</Button>
+              <Button variant="outline">
+                <Filter className="mr-2 h-4 w-4" /> {t('officer_filter')}
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuLabel>Filter by Risk</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuRadioGroup value={riskFilter} onValueChange={setRiskFilter}>
-                    <DropdownMenuRadioItem value="All">All</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Low">Low</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="Medium">Medium</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="High">High</DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
+              <DropdownMenuLabel>Filter by Risk</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={riskFilter}
+                onValueChange={setRiskFilter}
+              >
+                <DropdownMenuRadioItem value="All">All</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="Low">Low</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="Medium">
+                  Medium
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="High">High</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </CardHeader>
         <CardContent>
-            <Table>
-                <TableHeader>
-                <TableRow>
-                    <TableHead>{t('officer_table_beneficiary')}</TableHead>
-                    <TableHead>{t('officer_table_region')}</TableHead>
-                    <TableHead>Income Level</TableHead>
-                    <TableHead>{t('officer_table_ai_score')}</TableHead>
-                    <TableHead>{t('officer_table_risk')}</TableHead>
-                    <TableHead>{t('officer_table_loan_stage')}</TableHead>
-                    <TableHead className="text-right">{t('officer_table_actions')}</TableHead>
-                </TableRow>
-                </TableHeader>
-                <TableBody>
-                {filteredBeneficiaries.map((beneficiary) => {
-                    const isHighIncome = beneficiary.income >= INCOME_THRESHOLD;
-                    return (
-                        <TableRow key={beneficiary.id} className="transition-colors hover:bg-muted/50">
-                            <TableCell className="font-medium">
-                                {beneficiary.name}
-                            </TableCell>
-                            <TableCell>{beneficiary.region}</TableCell>
-                            <TableCell>
-                                <Badge variant={isHighIncome ? 'secondary' : 'outline'} className={cn(isHighIncome ? "text-green-700 border-green-700/50" : "text-amber-700 border-amber-700/50")}>
-                                    {isHighIncome ? "High" : "Low"}
-                                </Badge>
-                            </TableCell>
-                            <TableCell>{beneficiary.score}</TableCell>
-                            <TableCell>
-                                <Badge
-                                variant={riskVariant[beneficiary.risk]}
-                                className={riskColorClass[beneficiary.risk as keyof typeof riskColorClass]}
-                                >
-                                {beneficiary.risk}
-                                </Badge>
-                            </TableCell>
-                            <TableCell>{beneficiary.loanStage}</TableCell>
-                            <TableCell className="text-right">
-                                
-                                    <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                        <span className="sr-only">Open menu</span>
-                                        <MoreHorizontal className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                        <DropdownMenuItem onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Approved')}>
-                                        <CheckCircle className="mr-2 h-4 w-4" />
-                                        Approve
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem 
-                                            className="text-destructive focus:text-destructive"
-                                            onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Flagged')}
-                                        >
-                                        <Flag className="mr-2 h-4 w-4" />
-                                        Flag
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                    
-                                        <DropdownMenuItem onSelect={() => handleViewRiskAnalysis(beneficiary)}>
-                                            <FileText className="mr-2 h-4 w-4" />
-                                            View Risk Analysis
-                                        </DropdownMenuItem>
-                                    
-                                        <DropdownMenuItem>Request Verification</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                    </DropdownMenu>
-                            
-                            </TableCell>
-                        </TableRow>
-                    )
-                })}
-                </TableBody>
-            </Table>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('officer_table_beneficiary')}</TableHead>
+                <TableHead>{t('officer_table_region')}</TableHead>
+                <TableHead>Income Level</TableHead>
+                <TableHead>{t('officer_table_ai_score')}</TableHead>
+                <TableHead>{t('officer_table_risk')}</TableHead>
+                <TableHead>{t('officer_table_loan_stage')}</TableHead>
+                <TableHead className="text-right">
+                  {t('officer_table_actions')}
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredBeneficiaries.map((beneficiary) => {
+                const isHighIncome = beneficiary.income >= INCOME_THRESHOLD;
+                return (
+                  <TableRow
+                    key={beneficiary.id}
+                    className="transition-colors hover:bg-muted/50"
+                  >
+                    <TableCell className="font-medium">
+                      {beneficiary.name}
+                    </TableCell>
+                    <TableCell>{beneficiary.region}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={isHighIncome ? 'secondary' : 'outline'}
+                        className={cn(
+                          isHighIncome
+                            ? 'text-green-700 border-green-700/50'
+                            : 'text-amber-700 border-amber-700/50'
+                        )}
+                      >
+                        {isHighIncome ? 'High' : 'Low'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{beneficiary.score}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={riskVariant[beneficiary.risk]}
+                        className={
+                          riskColorClass[
+                            beneficiary.risk as keyof typeof riskColorClass
+                          ]
+                        }
+                      >
+                        {beneficiary.risk}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{beneficiary.loanStage}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem
+                            onSelect={() =>
+                              handleUpdateLoanStage(beneficiary.id, 'Approved')
+                            }
+                          >
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            Approve
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-destructive focus:text-destructive"
+                            onSelect={() =>
+                              handleUpdateLoanStage(beneficiary.id, 'Flagged')
+                            }
+                          >
+                            <Flag className="mr-2 h-4 w-4" />
+                            Flag
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+
+                          <DropdownMenuItem
+                            onSelect={() => handleViewRiskAnalysis(beneficiary)}
+                          >
+                            <FileText className="mr-2 h-4 w-4" />
+                            View Risk Analysis
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem>
+                            Request Verification
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
-      <RiskAnalysisDialog beneficiary={selectedBeneficiary} open={isDialogOpen} onOpenChange={setIsDialogOpen} />
-      
+      <RiskAnalysisDialog
+        beneficiary={selectedBeneficiary}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+      />
+
       <Card>
         <CardHeader>
           <CardTitle>Repayment by State (Mock Heatmap)</CardTitle>
-          <CardDescription>Visualization of repayment rates across key states.</CardDescription>
+          <CardDescription>
+            Visualization of repayment rates across key states.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-            <ChartContainer config={{ repayment: { label: "Repayment %", color: "hsl(var(--primary))"}}} className="h-[300px] w-full">
-              <BarChart data={geoData} layout="vertical" margin={{ left: 20 }}>
-                <CartesianGrid horizontal={false} />
-                <YAxis type="category" dataKey="name" tickLine={false} axisLine={false} />
-                <XAxis type="number" hide />
-                <Tooltip cursor={{fill: 'hsl(var(--muted))'}} content={<ChartTooltipContent indicator="dot" />} />
-                <Bar dataKey="repayment" radius={5} fill="var(--color-repayment)" />
-              </BarChart>
-            </ChartContainer>
+          <ChartContainer
+            config={{ repayment: { label: 'Repayment %', color: 'hsl(var(--primary))' } }}
+            className="h-[300px] w-full"
+          >
+            <BarChart data={geoData} layout="vertical" margin={{ left: 20 }}>
+              <CartesianGrid horizontal={false} />
+              <YAxis
+                type="category"
+                dataKey="name"
+                tickLine={false}
+                axisLine={false}
+              />
+              <XAxis type="number" hide />
+              <Tooltip
+                cursor={{ fill: 'hsl(var(--muted))' }}
+                content={<ChartTooltipContent indicator="dot" />}
+              />
+              <Bar
+                dataKey="repayment"
+                radius={5}
+                fill="var(--color-repayment)"
+              />
+            </BarChart>
+          </ChartContainer>
         </CardContent>
       </Card>
 
+      <div className="grid grid-cols-1">
+        <Card>
+          <CardHeader>
+            <CardTitle>Reporting</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-start gap-4">
+            <p className="text-sm text-muted-foreground">
+              Generate comprehensive policy reports based on current data and
+              trends.
+            </p>
+            <Button>
+              <Download className="mr-2 h-4 w-4" />
+              Generate Policy Report
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
+
+    

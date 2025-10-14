@@ -1,9 +1,10 @@
+
 export type User = {
   id: string;
   name: string;
   email: string;
   avatar: string;
-  role: 'beneficiary' | 'officer' | 'admin';
+  role: 'beneficiary' | 'officer';
   region: string;
 };
 
@@ -22,14 +23,6 @@ export const MOCK_USERS: User[] = [
     email: 'officer@example.com',
     avatar: 'https://i.pravatar.cc/150?u=usr_002',
     role: 'officer',
-    region: 'National',
-  },
-  {
-    id: 'usr_003',
-    name: 'Rohan Gupta (Demo)',
-    email: 'admin@example.com',
-    avatar: 'https://i.pravatar.cc/150?u=usr_003',
-    role: 'admin',
     region: 'National',
   },
    {
@@ -89,13 +82,13 @@ export const MOCK_BENEFICIARY_DATA = {
 };
 
 export const MOCK_BENEFICIARIES_LIST = [
-  { id: 'ben_01', name: 'Aarav Sharma', region: 'Maharashtra', score: 786, risk: 'Low', income: 75000, loanStage: 'Active', riskFactors: ['Consistent utility bill payments', 'Good income to loan ratio', 'Long credit history'] },
-  { id: 'ben_02', name: 'Diya Patel', region: 'Gujarat', score: 650, risk: 'Medium', income: 45000, loanStage: 'Active', riskFactors: ['High credit utilization on existing loans', 'Recent job change', 'Limited savings history'] },
+  { id: 'ben_01', name: 'Aarav Sharma', region: 'Maharashtra', score: 786, risk: 'Low', income: 75000, loanStage: 'Approved', riskFactors: ['Consistent utility bill payments', 'Good income to loan ratio', 'Long credit history'] },
+  { id: 'ben_02', name: 'Diya Patel', region: 'Gujarat', score: 650, risk: 'Medium', income: 45000, loanStage: 'Flagged', riskFactors: ['High credit utilization on existing loans', 'Recent job change', 'Limited savings history'] },
   { id: 'ben_03', name: 'Kiran Reddy', region: 'Andhra Pradesh', score: 520, risk: 'High', income: 25000, loanStage: 'Defaulted', riskFactors: ['History of late payments', 'Multiple recent credit inquiries', 'Low income compared to loan amount'] },
   { id: 'ben_04', name: 'Suresh Kumar', region: 'Uttar Pradesh', score: 710, risk: 'Low', income: 60000, loanStage: 'Approved', riskFactors: ['No previous defaults', 'Stable employment history', 'Low discretionary spending'] },
   { id: 'ben_05', name: 'Meena Kumari', region: 'Bihar', score: 680, risk: 'Medium', income: 35000, loanStage: 'Verification', riskFactors: ['Short credit history', 'Irregular income pattern from bill analysis', 'High loan amount requested'] },
-  { id: 'ben_06', name: 'Rajesh Singh', region: 'Rajasthan', score: 810, risk: 'Low', income: 90000, loanStage: 'Active', riskFactors: ['Excellent repayment history', 'Diversified sources of income', 'Low credit utilization'] },
-  { id: 'ben_07', name: 'Anita Das', region: 'West Bengal', score: 590, risk: 'High', income: 30000, loanStage: 'Active', riskFactors: ['Missed payments on a previous loan', 'High essential expenses reducing disposable income', 'No utility bills provided'] },
+  { id: 'ben_06', name: 'Rajesh Singh', region: 'Rajasthan', score: 810, risk: 'Low', income: 90000, loanStage: 'Approved', riskFactors: ['Excellent repayment history', 'Diversified sources of income', 'Low credit utilization'] },
+  { id: 'ben_07', name: 'Anita Das', region: 'West Bengal', score: 590, risk: 'High', income: 30000, loanStage: 'Flagged', riskFactors: ['Missed payments on a previous loan', 'High essential expenses reducing disposable income', 'No utility bills provided'] },
   { id: 'ben_08', name: 'Vijay Iyer', region: 'Tamil Nadu', score: 750, risk: 'Low', income: 80000, loanStage: 'Approved', riskFactors: ['Long and positive credit history', 'Owns property', 'Consistent savings indicated by low essential spending'] },
 ];
 
@@ -108,7 +101,7 @@ export const MOCK_ADMIN_DATA = {
         regionalDefaultRate: '3.4%',
     },
     riskDistribution: [
-        { name: 'Low Risk', value: 65, fill: 'hsl(var(--accent))' },
+        { name: 'Low Risk', value: 65, fill: 'hsl(var(--chart-2))' },
         { name: 'Medium Risk', value: 25, fill: 'hsl(var(--chart-3))' },
         { name: 'High Risk', value: 10, fill: 'hsl(var(--destructive))' },
     ],

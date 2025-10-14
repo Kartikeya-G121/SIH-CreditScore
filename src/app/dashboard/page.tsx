@@ -1,3 +1,4 @@
+
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -17,7 +18,6 @@ import {
 import { Logo } from '@/components/layout/logo';
 import BeneficiaryDashboard from '@/components/dashboards/beneficiary-dashboard';
 import OfficerDashboard from '@/components/dashboards/officer-dashboard';
-import AdminDashboard from '@/components/dashboards/admin-dashboard';
 import {
   LayoutDashboard,
   Users,
@@ -48,7 +48,7 @@ function DashboardSidebar() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const { t } = useLanguage();
-  const activeTab = searchParams.get('tab') || (user?.role === 'beneficiary' ? 'overview' : user?.role === 'officer' ? 'dashboard' : 'analytics');
+  const activeTab = searchParams.get('tab') || (user?.role === 'beneficiary' ? 'overview' : 'dashboard');
 
   const handleNav = (href: string) => {
     if (href.startsWith('#')) {
@@ -98,18 +98,6 @@ function DashboardSidebar() {
         id: 'beneficiaries',
         icon: <Users />,
         label: t('sidebar_beneficiaries'),
-      },
-    ],
-    admin: [
-      {
-        id: 'analytics',
-        icon: <LayoutDashboard />,
-        label: t('sidebar_analytics'),
-      },
-      {
-        id: 'user-management',
-        icon: <Users />,
-        label: t('sidebar_user_management'),
       },
     ],
   };
@@ -221,7 +209,6 @@ function DashboardHeader() {
   const roleHeadings = {
     beneficiary: "beneficiary_dashboard",
     officer: "officer_dashboard",
-    admin: "admin_dashboard"
   }
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
@@ -239,7 +226,7 @@ export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tab = searchParams.get('tab') || (user?.role === 'beneficiary' ? 'overview' : user?.role === 'officer' ? 'dashboard' : 'analytics');
+  const tab = searchParams.get('tab') || (user?.role === 'beneficiary' ? 'overview' : 'dashboard');
 
 
   useEffect(() => {
@@ -262,8 +249,6 @@ export default function DashboardPage() {
         return <BeneficiaryDashboard activeTab={tab} />;
       case 'officer':
         return <OfficerDashboard />;
-      case 'admin':
-        return <AdminDashboard />;
       default:
         return <div>Invalid Role. Please contact support.</div>;
     }
@@ -282,3 +267,5 @@ export default function DashboardPage() {
     </SidebarProvider>
   );
 }
+
+    
