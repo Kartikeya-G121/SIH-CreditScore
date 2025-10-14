@@ -455,7 +455,7 @@ export default function OfficerDashboard() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Repayment by State (Mock Heatmap)</CardTitle>
+          <CardTitle>Repayment by State</CardTitle>
           <CardDescription>
             Visualization of repayment rates across key states.
           </CardDescription>
@@ -508,5 +508,3 @@ export default function OfficerDashboard() {
     </div>
   );
 }
-
-    
