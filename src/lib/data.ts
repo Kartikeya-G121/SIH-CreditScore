@@ -89,14 +89,14 @@ export const MOCK_BENEFICIARY_DATA = {
 };
 
 export const MOCK_BENEFICIARIES_LIST = [
-  { id: 'ben_01', name: 'Aarav Sharma', region: 'Maharashtra', score: 786, risk: 'Low', loanStage: 'Active' },
-  { id: 'ben_02', name: 'Diya Patel', region: 'Gujarat', score: 650, risk: 'Medium', loanStage: 'Active' },
-  { id: 'ben_03', name: 'Kiran Reddy', region: 'Andhra Pradesh', score: 520, risk: 'High', loanStage: 'Defaulted' },
-  { id: 'ben_04', name: 'Suresh Kumar', region: 'Uttar Pradesh', score: 710, risk: 'Low', loanStage: 'Approved' },
-  { id: 'ben_05', name: 'Meena Kumari', region: 'Bihar', score: 680, risk: 'Medium', loanStage: 'Verification' },
-  { id: 'ben_06', name: 'Rajesh Singh', region: 'Rajasthan', score: 810, risk: 'Low', loanStage: 'Active' },
-  { id: 'ben_07', name: 'Anita Das', region: 'West Bengal', score: 590, risk: 'High', loanStage: 'Active' },
-  { id: 'ben_08', name: 'Vijay Iyer', region: 'Tamil Nadu', score: 750, risk: 'Low', loanStage: 'Approved' },
+  { id: 'ben_01', name: 'Aarav Sharma', region: 'Maharashtra', score: 786, risk: 'Low', loanStage: 'Active', riskFactors: ['Consistent utility bill payments', 'Good income to loan ratio', 'Long credit history'] },
+  { id: 'ben_02', name: 'Diya Patel', region: 'Gujarat', score: 650, risk: 'Medium', loanStage: 'Active', riskFactors: ['High credit utilization on existing loans', 'Recent job change', 'Limited savings history'] },
+  { id: 'ben_03', name: 'Kiran Reddy', region: 'Andhra Pradesh', score: 520, risk: 'High', loanStage: 'Defaulted', riskFactors: ['History of late payments', 'Multiple recent credit inquiries', 'Low income compared to loan amount'] },
+  { id: 'ben_04', name: 'Suresh Kumar', region: 'Uttar Pradesh', score: 710, risk: 'Low', loanStage: 'Approved', riskFactors: ['No previous defaults', 'Stable employment history', 'Low discretionary spending'] },
+  { id: 'ben_05', name: 'Meena Kumari', region: 'Bihar', score: 680, risk: 'Medium', loanStage: 'Verification', riskFactors: ['Short credit history', 'Irregular income pattern from bill analysis', 'High loan amount requested'] },
+  { id: 'ben_06', name: 'Rajesh Singh', region: 'Rajasthan', score: 810, risk: 'Low', loanStage: 'Active', riskFactors: ['Excellent repayment history', 'Diversified sources of income', 'Low credit utilization'] },
+  { id: 'ben_07', name: 'Anita Das', region: 'West Bengal', score: 590, risk: 'High', loanStage: 'Active', riskFactors: ['Missed payments on a previous loan', 'High essential expenses reducing disposable income', 'No utility bills provided'] },
+  { id: 'ben_08', name: 'Vijay Iyer', region: 'Tamil Nadu', score: 750, risk: 'Low', loanStage: 'Approved', riskFactors: ['Long and positive credit history', 'Owns property', 'Consistent savings indicated by low essential spending'] },
 ];
 
 

@@ -1,3 +1,6 @@
+
+'use client';
+import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -22,6 +25,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import {
   CheckCircle,
@@ -31,12 +42,18 @@ import {
   TrendingUp,
   MapPin,
   Filter,
+  FileText,
+  AlertCircle,
+  ThumbsUp,
+  Meh,
 } from 'lucide-react';
 import { MOCK_BENEFICIARIES_LIST } from '@/lib/data';
 import { StatCard } from '../shared/stat-card';
 import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '../ui/chart';
 import { useLanguage } from '@/contexts/language-context';
+
+type Beneficiary = typeof MOCK_BENEFICIARIES_LIST[0];
 
 const riskVariant: { [key: string]: 'default' | 'destructive' | 'outline' } = {
   Low: 'default',
@@ -48,6 +65,55 @@ const riskColorClass = {
   Medium: 'bg-yellow-500 text-white',
   High: 'bg-destructive text-destructive-foreground',
 };
+const riskIcon = {
+    Low: <ThumbsUp className="h-5 w-5 text-green-600" />,
+    Medium: <Meh className="h-5 w-5 text-yellow-500" />,
+    High: <AlertCircle className="h-5 w-5 text-destructive" />
+}
+
+function RiskAnalysisDialog({ beneficiary }: { beneficiary: Beneficiary }) {
+    const risk = beneficiary.risk as keyof typeof riskIcon;
+    return (
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                    {riskIcon[risk]}
+                    Risk Analysis for {beneficiary.name}
+                </DialogTitle>
+                <DialogDescription>
+                    AI-generated insights into the beneficiary's credit risk profile.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+                <div className="flex justify-around rounded-lg bg-muted p-4 text-center">
+                    <div>
+                        <p className="text-sm text-muted-foreground">AI Score</p>
+                        <p className="text-2xl font-bold">{beneficiary.score}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-muted-foreground">Risk Level</p>
+                        <p className="text-2xl font-bold flex items-center gap-2 justify-center">
+                             <Badge
+                                variant={riskVariant[beneficiary.risk]}
+                                className={riskColorClass[beneficiary.risk as keyof typeof riskColorClass]}
+                                >
+                                {beneficiary.risk}
+                            </Badge>
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <h4 className="font-semibold mb-2">Key Risk Factors:</h4>
+                    <ul className="space-y-2 list-disc list-inside">
+                        {beneficiary.riskFactors.map((factor, index) => (
+                            <li key={index} className="text-sm text-foreground">{factor}</li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        </DialogContent>
+    )
+}
 
 export default function OfficerDashboard() {
   const { t } = useLanguage();
@@ -97,61 +163,70 @@ export default function OfficerDashboard() {
           <Button variant="outline"><Filter className="mr-2 h-4 w-4"/> {t('officer_filter')}</Button>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('officer_table_beneficiary')}</TableHead>
-                <TableHead>{t('officer_table_region')}</TableHead>
-                <TableHead>{t('officer_table_ai_score')}</TableHead>
-                <TableHead>{t('officer_table_risk')}</TableHead>
-                <TableHead>{t('officer_table_loan_stage')}</TableHead>
-                <TableHead className="text-right">{t('officer_table_actions')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {MOCK_BENEFICIARIES_LIST.map((beneficiary) => (
-                <TableRow key={beneficiary.id} className="transition-colors hover:bg-muted/50">
-                  <TableCell className="font-medium">
-                    {beneficiary.name}
-                  </TableCell>
-                  <TableCell>{beneficiary.region}</TableCell>
-                  <TableCell>{beneficiary.score}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={riskVariant[beneficiary.risk]}
-                      className={riskColorClass[beneficiary.risk as keyof typeof riskColorClass]}
-                    >
-                      {beneficiary.risk}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{beneficiary.loanStage}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>
-                          <CheckCircle className="mr-2 h-4 w-4" />
-                          Approve
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive focus:text-destructive">
-                          <Flag className="mr-2 h-4 w-4" />
-                          Flag
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>Request Verification</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+            <Dialog>
+                <Table>
+                    <TableHeader>
+                    <TableRow>
+                        <TableHead>{t('officer_table_beneficiary')}</TableHead>
+                        <TableHead>{t('officer_table_region')}</TableHead>
+                        <TableHead>{t('officer_table_ai_score')}</TableHead>
+                        <TableHead>{t('officer_table_risk')}</TableHead>
+                        <TableHead>{t('officer_table_loan_stage')}</TableHead>
+                        <TableHead className="text-right">{t('officer_table_actions')}</TableHead>
+                    </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                    {MOCK_BENEFICIARIES_LIST.map((beneficiary) => (
+                        <TableRow key={beneficiary.id} className="transition-colors hover:bg-muted/50">
+                        <TableCell className="font-medium">
+                            {beneficiary.name}
+                        </TableCell>
+                        <TableCell>{beneficiary.region}</TableCell>
+                        <TableCell>{beneficiary.score}</TableCell>
+                        <TableCell>
+                            <Badge
+                            variant={riskVariant[beneficiary.risk]}
+                            className={riskColorClass[beneficiary.risk as keyof typeof riskColorClass]}
+                            >
+                            {beneficiary.risk}
+                            </Badge>
+                        </TableCell>
+                        <TableCell>{beneficiary.loanStage}</TableCell>
+                        <TableCell className="text-right">
+                            <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem>
+                                <CheckCircle className="mr-2 h-4 w-4" />
+                                Approve
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive focus:text-destructive">
+                                <Flag className="mr-2 h-4 w-4" />
+                                Flag
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DialogTrigger asChild>
+                                    <DropdownMenuItem>
+                                        <FileText className="mr-2 h-4 w-4" />
+                                        View Risk Analysis
+                                    </DropdownMenuItem>
+                                </DialogTrigger>
+                                <DropdownMenuItem>Request Verification</DropdownMenuItem>
+                            </DropdownMenuContent>
+                            </DropdownMenu>
+                             <RiskAnalysisDialog beneficiary={beneficiary} />
+                        </TableCell>
+                        </TableRow>
+                    ))}
+                    </TableBody>
+                </Table>
+            </Dialog>
         </CardContent>
       </Card>
       
