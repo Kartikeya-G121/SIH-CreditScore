@@ -46,6 +46,7 @@ import {
   AlertCircle,
   ThumbsUp,
   Meh,
+  IndianRupee,
 } from 'lucide-react';
 import { MOCK_BENEFICIARIES_LIST } from '@/lib/data';
 import { StatCard } from '../shared/stat-card';
@@ -72,48 +73,50 @@ const riskIcon = {
     High: <AlertCircle className="h-5 w-5 text-destructive" />
 }
 
-function RiskAnalysisDialog({ beneficiary }: { beneficiary: Beneficiary | null }) {
+function RiskAnalysisDialog({ beneficiary, open, onOpenChange }: { beneficiary: Beneficiary | null, open: boolean, onOpenChange: (open: boolean) => void }) {
     if (!beneficiary) return null;
     const risk = beneficiary.risk as keyof typeof riskIcon;
     return (
-        <DialogContent>
-            <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                    {riskIcon[risk]}
-                    Risk Analysis for {beneficiary.name}
-                </DialogTitle>
-                <DialogDescription>
-                    AI-generated insights into the beneficiary's credit risk profile.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-                <div className="flex justify-around rounded-lg bg-muted p-4 text-center">
-                    <div>
-                        <p className="text-sm text-muted-foreground">AI Score</p>
-                        <p className="text-2xl font-bold">{beneficiary.score}</p>
-                    </div>
-                    <div>
-                        <p className="text-sm text-muted-foreground">Risk Level</p>
-                        <div className="text-2xl font-bold flex items-center gap-2 justify-center">
-                             <Badge
-                                variant={riskVariant[beneficiary.risk]}
-                                className={riskColorClass[beneficiary.risk as keyof typeof riskColorClass]}
-                                >
-                                {beneficiary.risk}
-                            </Badge>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        {riskIcon[risk]}
+                        Risk Analysis for {beneficiary.name}
+                    </DialogTitle>
+                    <DialogDescription>
+                        AI-generated insights into the beneficiary's credit risk profile.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                    <div className="flex justify-around rounded-lg bg-muted p-4 text-center">
+                        <div>
+                            <p className="text-sm text-muted-foreground">AI Score</p>
+                            <p className="text-2xl font-bold">{beneficiary.score}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">Risk Level</p>
+                            <div className="text-2xl font-bold flex items-center gap-2 justify-center">
+                                <Badge
+                                    variant={riskVariant[beneficiary.risk]}
+                                    className={riskColorClass[beneficiary.risk as keyof typeof riskColorClass]}
+                                    >
+                                    {beneficiary.risk}
+                                </Badge>
+                            </div>
                         </div>
                     </div>
+                    <div>
+                        <h4 className="font-semibold mb-2">Key Risk Factors:</h4>
+                        <ul className="space-y-2 list-disc list-inside">
+                            {beneficiary.riskFactors.map((factor, index) => (
+                                <li key={index} className="text-sm text-foreground">{factor}</li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
-                <div>
-                    <h4 className="font-semibold mb-2">Key Risk Factors:</h4>
-                    <ul className="space-y-2 list-disc list-inside">
-                        {beneficiary.riskFactors.map((factor, index) => (
-                            <li key={index} className="text-sm text-foreground">{factor}</li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-        </DialogContent>
+            </DialogContent>
+        </Dialog>
     )
 }
 
@@ -209,75 +212,80 @@ export default function OfficerDashboard() {
           </DropdownMenu>
         </CardHeader>
         <CardContent>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <Table>
-                    <TableHeader>
-                    <TableRow>
-                        <TableHead>{t('officer_table_beneficiary')}</TableHead>
-                        <TableHead>{t('officer_table_region')}</TableHead>
-                        <TableHead>{t('officer_table_ai_score')}</TableHead>
-                        <TableHead>{t('officer_table_risk')}</TableHead>
-                        <TableHead>{t('officer_table_loan_stage')}</TableHead>
-                        <TableHead className="text-right">{t('officer_table_actions')}</TableHead>
+            <Table>
+                <TableHeader>
+                <TableRow>
+                    <TableHead>{t('officer_table_beneficiary')}</TableHead>
+                    <TableHead>{t('officer_table_region')}</TableHead>
+                    <TableHead>Income</TableHead>
+                    <TableHead>{t('officer_table_ai_score')}</TableHead>
+                    <TableHead>{t('officer_table_risk')}</TableHead>
+                    <TableHead>{t('officer_table_loan_stage')}</TableHead>
+                    <TableHead className="text-right">{t('officer_table_actions')}</TableHead>
+                </TableRow>
+                </TableHeader>
+                <TableBody>
+                {filteredBeneficiaries.map((beneficiary) => (
+                    <TableRow key={beneficiary.id} className="transition-colors hover:bg-muted/50">
+                    <TableCell className="font-medium">
+                        {beneficiary.name}
+                    </TableCell>
+                    <TableCell>{beneficiary.region}</TableCell>
+                    <TableCell>
+                      <div className='flex items-center'>
+                        <IndianRupee className='h-4 w-4 mr-1 text-muted-foreground' />
+                        {beneficiary.income.toLocaleString('en-IN')}
+                      </div>
+                    </TableCell>
+                    <TableCell>{beneficiary.score}</TableCell>
+                    <TableCell>
+                        <Badge
+                        variant={riskVariant[beneficiary.risk]}
+                        className={riskColorClass[beneficiary.risk as keyof typeof riskColorClass]}
+                        >
+                        {beneficiary.risk}
+                        </Badge>
+                    </TableCell>
+                    <TableCell>{beneficiary.loanStage}</TableCell>
+                    <TableCell className="text-right">
+                        
+                            <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Approved')}>
+                                <CheckCircle className="mr-2 h-4 w-4" />
+                                Approve
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                    className="text-destructive focus:text-destructive"
+                                    onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Flagged')}
+                                >
+                                <Flag className="mr-2 h-4 w-4" />
+                                Flag
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                               
+                                <DropdownMenuItem onSelect={() => handleViewRiskAnalysis(beneficiary)}>
+                                    <FileText className="mr-2 h-4 w-4" />
+                                    View Risk Analysis
+                                </DropdownMenuItem>
+                               
+                                <DropdownMenuItem>Request Verification</DropdownMenuItem>
+                            </DropdownMenuContent>
+                            </DropdownMenu>
+                       
+                    </TableCell>
                     </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                    {filteredBeneficiaries.map((beneficiary) => (
-                        <TableRow key={beneficiary.id} className="transition-colors hover:bg-muted/50">
-                        <TableCell className="font-medium">
-                            {beneficiary.name}
-                        </TableCell>
-                        <TableCell>{beneficiary.region}</TableCell>
-                        <TableCell>{beneficiary.score}</TableCell>
-                        <TableCell>
-                            <Badge
-                            variant={riskVariant[beneficiary.risk]}
-                            className={riskColorClass[beneficiary.risk as keyof typeof riskColorClass]}
-                            >
-                            {beneficiary.risk}
-                            </Badge>
-                        </TableCell>
-                        <TableCell>{beneficiary.loanStage}</TableCell>
-                        <TableCell className="text-right">
-                            
-                                <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Open menu</span>
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                    <DropdownMenuItem onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Approved')}>
-                                    <CheckCircle className="mr-2 h-4 w-4" />
-                                    Approve
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem 
-                                        className="text-destructive focus:text-destructive"
-                                        onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Flagged')}
-                                    >
-                                    <Flag className="mr-2 h-4 w-4" />
-                                    Flag
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                   
-                                    <DropdownMenuItem onSelect={() => handleViewRiskAnalysis(beneficiary)}>
-                                        <FileText className="mr-2 h-4 w-4" />
-                                        View Risk Analysis
-                                    </DropdownMenuItem>
-                                   
-                                    <DropdownMenuItem>Request Verification</DropdownMenuItem>
-                                </DropdownMenuContent>
-                                </DropdownMenu>
-                           
-                        </TableCell>
-                        </TableRow>
-                    ))}
-                    </TableBody>
-                </Table>
-                <RiskAnalysisDialog beneficiary={selectedBeneficiary} />
-            </Dialog>
+                ))}
+                </TableBody>
+            </Table>
+            <RiskAnalysisDialog beneficiary={selectedBeneficiary} open={isDialogOpen} onOpenChange={setIsDialogOpen} />
         </CardContent>
       </Card>
       
