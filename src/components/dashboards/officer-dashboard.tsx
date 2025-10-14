@@ -54,6 +54,7 @@ import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Ba
 import { ChartContainer, ChartTooltipContent } from '../ui/chart';
 import { useLanguage } from '@/contexts/language-context';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 type Beneficiary = typeof MOCK_BENEFICIARIES_LIST[0];
 
@@ -72,6 +73,8 @@ const riskIcon = {
     Medium: <Meh className="h-5 w-5 text-yellow-500" />,
     High: <AlertCircle className="h-5 w-5 text-destructive" />
 }
+
+const INCOME_THRESHOLD = 50000;
 
 function RiskAnalysisDialog({ beneficiary, open, onOpenChange }: { beneficiary: Beneficiary | null, open: boolean, onOpenChange: (open: boolean) => void }) {
     if (!beneficiary) return null;
@@ -225,64 +228,72 @@ export default function OfficerDashboard() {
                 </TableRow>
                 </TableHeader>
                 <TableBody>
-                {filteredBeneficiaries.map((beneficiary) => (
-                    <TableRow key={beneficiary.id} className="transition-colors hover:bg-muted/50">
-                    <TableCell className="font-medium">
-                        {beneficiary.name}
-                    </TableCell>
-                    <TableCell>{beneficiary.region}</TableCell>
-                    <TableCell>
-                      <div className='flex items-center'>
-                        <IndianRupee className='h-4 w-4 mr-1 text-muted-foreground' />
-                        {beneficiary.income.toLocaleString('en-IN')}
-                      </div>
-                    </TableCell>
-                    <TableCell>{beneficiary.score}</TableCell>
-                    <TableCell>
-                        <Badge
-                        variant={riskVariant[beneficiary.risk]}
-                        className={riskColorClass[beneficiary.risk as keyof typeof riskColorClass]}
-                        >
-                        {beneficiary.risk}
-                        </Badge>
-                    </TableCell>
-                    <TableCell>{beneficiary.loanStage}</TableCell>
-                    <TableCell className="text-right">
-                        
-                            <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Approved')}>
-                                <CheckCircle className="mr-2 h-4 w-4" />
-                                Approve
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                    className="text-destructive focus:text-destructive"
-                                    onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Flagged')}
+                {filteredBeneficiaries.map((beneficiary) => {
+                    const isHighIncome = beneficiary.income >= INCOME_THRESHOLD;
+                    return (
+                        <TableRow key={beneficiary.id} className="transition-colors hover:bg-muted/50">
+                            <TableCell className="font-medium">
+                                {beneficiary.name}
+                            </TableCell>
+                            <TableCell>{beneficiary.region}</TableCell>
+                            <TableCell>
+                                <div className='flex items-center gap-2'>
+                                    <div className='flex items-center'>
+                                      <IndianRupee className='h-4 w-4 mr-1 text-muted-foreground' />
+                                      {beneficiary.income.toLocaleString('en-IN')}
+                                    </div>
+                                    <Badge variant={isHighIncome ? 'secondary' : 'outline'} className={cn(isHighIncome ? "text-green-700 border-green-700/50" : "text-amber-700 border-amber-700/50")}>
+                                      {isHighIncome ? "High" : "Low"}
+                                    </Badge>
+                                </div>
+                            </TableCell>
+                            <TableCell>{beneficiary.score}</TableCell>
+                            <TableCell>
+                                <Badge
+                                variant={riskVariant[beneficiary.risk]}
+                                className={riskColorClass[beneficiary.risk as keyof typeof riskColorClass]}
                                 >
-                                <Flag className="mr-2 h-4 w-4" />
-                                Flag
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                               
-                                <DropdownMenuItem onSelect={() => handleViewRiskAnalysis(beneficiary)}>
-                                    <FileText className="mr-2 h-4 w-4" />
-                                    View Risk Analysis
-                                </DropdownMenuItem>
-                               
-                                <DropdownMenuItem>Request Verification</DropdownMenuItem>
-                            </DropdownMenuContent>
-                            </DropdownMenu>
-                       
-                    </TableCell>
-                    </TableRow>
-                ))}
+                                {beneficiary.risk}
+                                </Badge>
+                            </TableCell>
+                            <TableCell>{beneficiary.loanStage}</TableCell>
+                            <TableCell className="text-right">
+                                
+                                    <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                        <span className="sr-only">Open menu</span>
+                                        <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                        <DropdownMenuItem onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Approved')}>
+                                        <CheckCircle className="mr-2 h-4 w-4" />
+                                        Approve
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem 
+                                            className="text-destructive focus:text-destructive"
+                                            onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Flagged')}
+                                        >
+                                        <Flag className="mr-2 h-4 w-4" />
+                                        Flag
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                    
+                                        <DropdownMenuItem onSelect={() => handleViewRiskAnalysis(beneficiary)}>
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            View Risk Analysis
+                                        </DropdownMenuItem>
+                                    
+                                        <DropdownMenuItem>Request Verification</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                    </DropdownMenu>
+                            
+                            </TableCell>
+                        </TableRow>
+                    )
+                })}
                 </TableBody>
             </Table>
             <RiskAnalysisDialog beneficiary={selectedBeneficiary} open={isDialogOpen} onOpenChange={setIsDialogOpen} />
