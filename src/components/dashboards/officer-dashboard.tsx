@@ -1,6 +1,6 @@
 
 'use client';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -24,6 +24,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu';
 import {
   Dialog,
@@ -120,6 +122,7 @@ export default function OfficerDashboard() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [beneficiaries, setBeneficiaries] = useState(MOCK_BENEFICIARIES_LIST);
+  const [riskFilter, setRiskFilter] = useState('All');
 
   const handleUpdateLoanStage = (beneficiaryId: string, stage: 'Approved' | 'Flagged') => {
     setBeneficiaries(prev => 
@@ -141,6 +144,13 @@ export default function OfficerDashboard() {
     { name: 'Bihar', repayment: 88 },
     { name: 'Rajasthan', repayment: 99 },
   ];
+
+  const filteredBeneficiaries = useMemo(() => {
+    if (riskFilter === 'All') {
+      return beneficiaries;
+    }
+    return beneficiaries.filter(b => b.risk === riskFilter);
+  }, [beneficiaries, riskFilter]);
 
   return (
     <div className="space-y-6">
@@ -176,7 +186,21 @@ export default function OfficerDashboard() {
               {t('officer_beneficiaries_desc')}
             </CardDescription>
           </div>
-          <Button variant="outline"><Filter className="mr-2 h-4 w-4"/> {t('officer_filter')}</Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline"><Filter className="mr-2 h-4 w-4"/> {t('officer_filter')}</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                <DropdownMenuLabel>Filter by Risk</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup value={riskFilter} onValueChange={setRiskFilter}>
+                    <DropdownMenuRadioItem value="All">All</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Low">Low</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="Medium">Medium</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="High">High</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </CardHeader>
         <CardContent>
             <Dialog>
@@ -192,7 +216,7 @@ export default function OfficerDashboard() {
                     </TableRow>
                     </TableHeader>
                     <TableBody>
-                    {beneficiaries.map((beneficiary) => (
+                    {filteredBeneficiaries.map((beneficiary) => (
                         <TableRow key={beneficiary.id} className="transition-colors hover:bg-muted/50">
                         <TableCell className="font-medium">
                             {beneficiary.name}
@@ -209,36 +233,38 @@ export default function OfficerDashboard() {
                         </TableCell>
                         <TableCell>{beneficiary.loanStage}</TableCell>
                         <TableCell className="text-right">
-                            <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Approved')}>
-                                <CheckCircle className="mr-2 h-4 w-4" />
-                                Approve
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                    className="text-destructive focus:text-destructive"
-                                    onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Flagged')}
-                                >
-                                <Flag className="mr-2 h-4 w-4" />
-                                Flag
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DialogTrigger asChild>
-                                    <DropdownMenuItem>
-                                        <FileText className="mr-2 h-4 w-4" />
-                                        View Risk Analysis
+                            <DialogTrigger asChild>
+                                <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <span className="sr-only">Open menu</span>
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                    <DropdownMenuItem onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Approved')}>
+                                    <CheckCircle className="mr-2 h-4 w-4" />
+                                    Approve
                                     </DropdownMenuItem>
-                                </DialogTrigger>
-                                <DropdownMenuItem>Request Verification</DropdownMenuItem>
-                            </DropdownMenuContent>
-                            </DropdownMenu>
+                                    <DropdownMenuItem 
+                                        className="text-destructive focus:text-destructive"
+                                        onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Flagged')}
+                                    >
+                                    <Flag className="mr-2 h-4 w-4" />
+                                    Flag
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DialogTrigger asChild>
+                                        <DropdownMenuItem>
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            View Risk Analysis
+                                        </DropdownMenuItem>
+                                    </DialogTrigger>
+                                    <DropdownMenuItem>Request Verification</DropdownMenuItem>
+                                </DropdownMenuContent>
+                                </DropdownMenu>
+                            </DialogTrigger>
                              <RiskAnalysisDialog beneficiary={beneficiary} />
                         </TableCell>
                         </TableRow>
