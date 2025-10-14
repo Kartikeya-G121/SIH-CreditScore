@@ -52,6 +52,7 @@ import { StatCard } from '../shared/stat-card';
 import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '../ui/chart';
 import { useLanguage } from '@/contexts/language-context';
+import { useToast } from '@/hooks/use-toast';
 
 type Beneficiary = typeof MOCK_BENEFICIARIES_LIST[0];
 
@@ -117,6 +118,21 @@ function RiskAnalysisDialog({ beneficiary }: { beneficiary: Beneficiary }) {
 
 export default function OfficerDashboard() {
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const [beneficiaries, setBeneficiaries] = useState(MOCK_BENEFICIARIES_LIST);
+
+  const handleUpdateLoanStage = (beneficiaryId: string, stage: 'Approved' | 'Flagged') => {
+    setBeneficiaries(prev => 
+        prev.map(b => 
+            b.id === beneficiaryId ? { ...b, loanStage: stage } : b
+        )
+    );
+    toast({
+        title: `Beneficiary ${stage}`,
+        description: `The loan application has been marked as ${stage}.`
+    });
+  };
+
   const geoData = [
     { name: 'Maharashtra', repayment: 98 },
     { name: 'Gujarat', repayment: 92 },
@@ -176,7 +192,7 @@ export default function OfficerDashboard() {
                     </TableRow>
                     </TableHeader>
                     <TableBody>
-                    {MOCK_BENEFICIARIES_LIST.map((beneficiary) => (
+                    {beneficiaries.map((beneficiary) => (
                         <TableRow key={beneficiary.id} className="transition-colors hover:bg-muted/50">
                         <TableCell className="font-medium">
                             {beneficiary.name}
@@ -202,11 +218,14 @@ export default function OfficerDashboard() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Approved')}>
                                 <CheckCircle className="mr-2 h-4 w-4" />
                                 Approve
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive focus:text-destructive">
+                                <DropdownMenuItem 
+                                    className="text-destructive focus:text-destructive"
+                                    onSelect={() => handleUpdateLoanStage(beneficiary.id, 'Flagged')}
+                                >
                                 <Flag className="mr-2 h-4 w-4" />
                                 Flag
                                 </DropdownMenuItem>
