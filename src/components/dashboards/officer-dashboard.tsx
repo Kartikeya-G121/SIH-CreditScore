@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useMemo } from 'react';
 import {
@@ -33,7 +32,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -74,7 +72,8 @@ const riskIcon = {
     High: <AlertCircle className="h-5 w-5 text-destructive" />
 }
 
-function RiskAnalysisDialog({ beneficiary }: { beneficiary: Beneficiary }) {
+function RiskAnalysisDialog({ beneficiary }: { beneficiary: Beneficiary | null }) {
+    if (!beneficiary) return null;
     const risk = beneficiary.risk as keyof typeof riskIcon;
     return (
         <DialogContent>
@@ -123,6 +122,8 @@ export default function OfficerDashboard() {
   const { toast } = useToast();
   const [beneficiaries, setBeneficiaries] = useState(MOCK_BENEFICIARIES_LIST);
   const [riskFilter, setRiskFilter] = useState('All');
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState<Beneficiary | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleUpdateLoanStage = (beneficiaryId: string, stage: 'Approved' | 'Flagged') => {
     setBeneficiaries(prev => 
@@ -135,6 +136,11 @@ export default function OfficerDashboard() {
         description: `The loan application has been marked as ${stage}.`
     });
   };
+
+  const handleViewRiskAnalysis = (beneficiary: Beneficiary) => {
+    setSelectedBeneficiary(beneficiary);
+    setIsDialogOpen(true);
+  }
 
   const geoData = [
     { name: 'Maharashtra', repayment: 98 },
@@ -203,7 +209,7 @@ export default function OfficerDashboard() {
           </DropdownMenu>
         </CardHeader>
         <CardContent>
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <Table>
                     <TableHeader>
                     <TableRow>
@@ -255,22 +261,22 @@ export default function OfficerDashboard() {
                                     Flag
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DialogTrigger asChild>
-                                        <DropdownMenuItem>
-                                            <FileText className="mr-2 h-4 w-4" />
-                                            View Risk Analysis
-                                        </DropdownMenuItem>
-                                    </DialogTrigger>
+                                   
+                                    <DropdownMenuItem onSelect={() => handleViewRiskAnalysis(beneficiary)}>
+                                        <FileText className="mr-2 h-4 w-4" />
+                                        View Risk Analysis
+                                    </DropdownMenuItem>
+                                   
                                     <DropdownMenuItem>Request Verification</DropdownMenuItem>
                                 </DropdownMenuContent>
                                 </DropdownMenu>
                            
-                             <RiskAnalysisDialog beneficiary={beneficiary} />
                         </TableCell>
                         </TableRow>
                     ))}
                     </TableBody>
                 </Table>
+                <RiskAnalysisDialog beneficiary={selectedBeneficiary} />
             </Dialog>
         </CardContent>
       </Card>
