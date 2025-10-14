@@ -92,14 +92,14 @@ function RiskAnalysisDialog({ beneficiary }: { beneficiary: Beneficiary }) {
                     </div>
                     <div>
                         <p className="text-sm text-muted-foreground">Risk Level</p>
-                        <p className="text-2xl font-bold flex items-center gap-2 justify-center">
+                        <div className="text-2xl font-bold flex items-center gap-2 justify-center">
                              <Badge
                                 variant={riskVariant[beneficiary.risk]}
                                 className={riskColorClass[beneficiary.risk as keyof typeof riskColorClass]}
                                 >
                                 {beneficiary.risk}
                             </Badge>
-                        </p>
+                        </div>
                     </div>
                 </div>
                 <div>
