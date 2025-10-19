@@ -1,10 +1,5 @@
 # 💳 Beneficiary Credit Scoring with Income Verification Layer for Direct Digital Lending  
 
-[![Smart India Hackathon](https://img.shields.io/badge/Smart%20India%20Hackathon-2025-orange?style=for-the-badge&logo=hackaday)]()  
-[![Built with Spring Boot](https://img.shields.io/badge/Backend-Spring%20Boot-green?style=for-the-badge&logo=springboot)]()  
-[![AI/ML Powered](https://img.shields.io/badge/AI%2FML-Powered-blue?style=for-the-badge&logo=python)]()  
-[![License](https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge)]()  
-
 ---
 
 ### 🧠 Smart India Hackathon 2025 — Team *UDAAN!*  
